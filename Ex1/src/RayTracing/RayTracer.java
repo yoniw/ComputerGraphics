@@ -50,7 +50,7 @@ public class RayTracer {
 
 			// Parse scene file:
 			tracer.parseScene(sceneFileName);
-
+			
 			// Render scene:
 			tracer.renderScene(outputFileName);
 
@@ -154,6 +154,7 @@ public class RayTracer {
 	 */
 	public void renderScene(String outputFileName)
 	{
+		
 		long startTime = System.currentTimeMillis();
 
 		// Create a byte array to hold the pixel data:
@@ -165,7 +166,7 @@ public class RayTracer {
 		
 		//TODO fill up the matrix
 		renderScene(RGBMatrix);
-
+		
 		convertRGBMatrixtoByteArray(rgbData, RGBMatrix);
 		
 		long endTime = System.currentTimeMillis();
@@ -182,16 +183,24 @@ public class RayTracer {
 
 	}
 
-	
+	//TODO
 	private void renderScene(RGB[][] RGBMatrix) {
 		
-		//TODO
+		//TODO temporary impl.
+		for (int i = 0; i < RGBMatrix.length; i++)
+		{
+			for (int j = 0; j < RGBMatrix.length; j++)
+			{
+				RGBMatrix[i][j] = new RGB(0,0,0);
+			}
+		}
 		
 		
 	}
 
 	//TODO make sure there's no confusion between x and y, width and height etc.
 	private void convertRGBMatrixtoByteArray(byte[] rgbData, RGB[][] RGBMatrix) {
+		
 		for (int x = 0; x < this.imageWidth; x++)
 		{
 			for (int y = 0; y < this.imageHeight; y++)
@@ -201,7 +210,7 @@ public class RayTracer {
 				rgbData[(y * this.imageWidth + x) * 3 + 2] = RGBMatrix[x][y].getBlue();
 			}
 		}
-
+		
 	}
 	
 	

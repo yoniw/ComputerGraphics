@@ -12,6 +12,11 @@ public class RGB {
 		this.green = green;
 		this.blue = blue;
 	}
+	
+	public RGB(int red, int green, int blue) {
+		this((byte)red, (byte)green, (byte)blue);
+	}
+	
 	public byte getRed()
 	{
 		return red;
