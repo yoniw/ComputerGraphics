@@ -159,17 +159,15 @@ public class RayTracer {
 		// Create a byte array to hold the pixel data:
 		byte[] rgbData = new byte[this.imageWidth * this.imageHeight * 3];
 
+		
+		//TODO make sure there's no confusion between x and y, width and height etc.
+		RGB[][] RGBMatrix = new RGB[this.imageHeight][this.imageWidth];
+		
+		//TODO fill up the matrix
+		renderScene(RGBMatrix);
 
-                // Put your ray tracing code here!
-                //
-                // Write pixel color values in RGB format to rgbData:
-                // Pixel [x, y] red component is in rgbData[(y * this.imageWidth + x) * 3]
-                //            green component is in rgbData[(y * this.imageWidth + x) * 3 + 1]
-                //             blue component is in rgbData[(y * this.imageWidth + x) * 3 + 2]
-                //
-                // Each of the red, green and blue components should be a byte, i.e. 0-255
-
-
+		convertRGBMatrixtoByteArray(rgbData, RGBMatrix);
+		
 		long endTime = System.currentTimeMillis();
 		Long renderTime = endTime - startTime;
 
@@ -184,8 +182,29 @@ public class RayTracer {
 
 	}
 
+	
+	private void renderScene(RGB[][] RGBMatrix) {
+		
+		//TODO
+		
+		
+	}
 
+	//TODO make sure there's no confusion between x and y, width and height etc.
+	private void convertRGBMatrixtoByteArray(byte[] rgbData, RGB[][] RGBMatrix) {
+		for (int x = 0; x < this.imageWidth; x++)
+		{
+			for (int y = 0; y < this.imageHeight; y++)
+			{
+				rgbData[(y * this.imageWidth + x) * 3] = RGBMatrix[x][y].getRed();
+				rgbData[(y * this.imageWidth + x) * 3 + 1] = RGBMatrix[x][y].getGreen();
+				rgbData[(y * this.imageWidth + x) * 3 + 2] = RGBMatrix[x][y].getBlue();
+			}
+		}
 
+	}
+	
+	
 
 	//////////////////////// FUNCTIONS TO SAVE IMAGES IN PNG FORMAT //////////////////////////////////////////
 
