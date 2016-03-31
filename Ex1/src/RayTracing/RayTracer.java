@@ -8,6 +8,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import javax.imageio.ImageIO;
@@ -20,6 +21,7 @@ public class RayTracer {
 	public int imageWidth;
 	public int imageHeight;
 
+	private Scene scene;
 	/**
 	 * Runs the ray tracer. Takes scene file, output image file and image size as input.
 	 */
@@ -75,8 +77,14 @@ public class RayTracer {
 		int lineNum = 0;
 		System.out.println("Started parsing scene file " + sceneFileName);
 
-
-
+		Camera cam = null;
+		Settings set = null;
+		List<Material> materialsList = new ArrayList<>();
+		List<Sphere> spheresList = new ArrayList<>();
+		List<Plane> planesList = new ArrayList<>();
+		List<Cylinder> cylindersList = new ArrayList<>();
+		List<Light> lightsList = new ArrayList<>();
+		
 		while ((line = r.readLine()) != null)
 		{
 			line = line.trim();
@@ -94,50 +102,37 @@ public class RayTracer {
 
 				if (code.equals("cam"))
 				{
-                                        // Add code here to parse camera parameters
-
+					cam = new Camera(params);
 					System.out.println(String.format("Parsed camera parameters (line %d)", lineNum));
 				}
 				else if (code.equals("set"))
 				{
-                                        // Add code here to parse general settings parameters
-
+					set = new Settings(params);
 					System.out.println(String.format("Parsed general settings (line %d)", lineNum));
 				}
 				else if (code.equals("mtl"))
 				{
-                                        // Add code here to parse material parameters
-
+					materialsList.add(new Material(params));
 					System.out.println(String.format("Parsed material (line %d)", lineNum));
 				}
 				else if (code.equals("sph"))
 				{
-                                        // Add code here to parse sphere parameters
-
-                                        // Example (you can implement this in many different ways!):
-					                    // Sphere sphere = new Sphere();
-                                        // sphere.setCenter(params[0], params[1], params[2]);
-                                        // sphere.setRadius(params[3]);
-                                        // sphere.setMaterial(params[4]);
-
+					spheresList.add(new Sphere(params));
 					System.out.println(String.format("Parsed sphere (line %d)", lineNum));
 				}
 				else if (code.equals("pln"))
 				{
-                                        // Add code here to parse plane parameters
-
+					planesList.add(new Plane(params));
 					System.out.println(String.format("Parsed plane (line %d)", lineNum));
 				}
 				else if (code.equals("cyl"))
 				{
-                                        // Add code here to parse cylinder parameters
-
+					cylindersList.add(new Cylinder(params));
 					System.out.println(String.format("Parsed cylinder (line %d)", lineNum));
 				}
 				else if (code.equals("lgt"))
 				{
-                                        // Add code here to parse light parameters
-
+					lightsList.add(new Light(params));
 					System.out.println(String.format("Parsed light (line %d)", lineNum));
 				}
 				else
@@ -147,11 +142,11 @@ public class RayTracer {
 			}
 		}
 
-                // It is recommended that you check here that the scene is valid,
-                // for example camera settings and all necessary materials were defined.
-
+		scene = new Scene(cam, set, materialsList, spheresList, planesList, cylindersList, lightsList);
+		
 		System.out.println("Finished parsing scene file " + sceneFileName);
 
+		
 	}
 
 	/**
