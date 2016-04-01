@@ -4,13 +4,13 @@ import java.util.List;
 
 public class Scene {
 	
-	Camera cam;
-	Settings set;
-	List<Material> materialsList;
-	List<Sphere> spheresList;
-	List<Plane> planesList;
-	List<Cylinder> cylindersList;
-	List<Light> lightsList;
+	private Camera cam;
+	private Settings set;
+	private List<Material> materialsList;
+	private List<Sphere> spheresList;
+	private List<Plane> planesList;
+	private List<Cylinder> cylindersList;
+	private List<Light> lightsList;
 
 	public Scene(Camera cam, Settings set, List<Material> materialsList, List<Sphere> spheresList,
 			List<Plane> planesList, List<Cylinder> cylindersList, List<Light> lightsList) {
@@ -23,5 +23,9 @@ public class Scene {
 		this.lightsList = lightsList;
 	}
 
+	public Camera getCamera()
+	{
+		return cam;
+	}
 	
 }
