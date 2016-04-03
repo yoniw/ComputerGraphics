@@ -2,14 +2,14 @@ package RayTracing;
 
 public class Ray {
 
-	private double[] src;
-	private double[] dst;
-	
-	public Ray(double[] src, double[] dst)
+	private Point src;
+	private Point dst;
+
+	public Ray(Point src, Point dst)
 	{
 		this.src = src;
 		this.dst = dst;
 	}
-	
-	
+
+
 }

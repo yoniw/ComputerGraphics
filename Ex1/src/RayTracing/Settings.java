@@ -2,15 +2,15 @@ package RayTracing;
 
 public class Settings {
 
-	private double[] backgroundColorRGB;
-	private double[] rootNumberOfShadowRays;
-	private double[] maxNumberOfRecursions;
+	private RGB backgroundColorRGB;
+	private int rootNumberOfShadowRays;
+	private int maxNumberOfRecursions;
 	
 	public Settings(String[] params)
 	{
-		backgroundColorRGB = new double[]{Double.parseDouble(params[0]), Double.parseDouble(params[1]), Double.parseDouble(params[2])};
-		rootNumberOfShadowRays = new double[]{Double.parseDouble(params[3])};
-		maxNumberOfRecursions = new double[]{Double.parseDouble(params[4])};
+		backgroundColorRGB = new RGB(Integer.parseInt(params[0]), Integer.parseInt(params[1]), Integer.parseInt(params[2]));
+		rootNumberOfShadowRays = Integer.parseInt(params[3]);
+		maxNumberOfRecursions = Integer.parseInt(params[4]);
 	}
 	
 	
