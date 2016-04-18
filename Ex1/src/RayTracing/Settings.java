@@ -13,5 +13,8 @@ public class Settings {
 		maxNumberOfRecursions = Integer.parseInt(params[4]);
 	}
 	
-	
+	public RGB getBackgroundColor()
+	{
+		return backgroundColorRGB;
+	}
 }

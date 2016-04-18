@@ -1,6 +1,6 @@
 package RayTracing;
 
-public class Cylinder {
+public class Cylinder implements Surface{
 
 	private Point centerPosition;
 	private double length;

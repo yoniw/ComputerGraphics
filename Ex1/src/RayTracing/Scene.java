@@ -28,4 +28,9 @@ public class Scene {
 		return cam;
 	}
 	
+	public Settings getSettings()
+	{
+		return set;
+	}
+	
 }

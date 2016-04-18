@@ -17,6 +17,11 @@ public class RGB {
 		this((byte)red, (byte)green, (byte)blue);
 	}
 	
+	public RGB(int[] rgbColors)
+	{
+		this(rgbColors[0], rgbColors[1], rgbColors[2]);
+	}
+	
 	public byte getRed()
 	{
 		return red;

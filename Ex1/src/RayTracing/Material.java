@@ -18,4 +18,20 @@ public class Material {
 		transparency = Double.parseDouble(params[10]);
 		//incidence = Double.parseDouble(params[11]);
 	}
+	
+	public RGB getDiffuseColor()
+	{
+		return diffuseColorRGB;
+	}
+	
+	public RGB getSpecularColor()
+	{
+		return specularColorRGB;
+	}
+	
+	public RGB getReflectionColor()
+	{
+		return reflectionColorRGB;
+	}
+	
 }
