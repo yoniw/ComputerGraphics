@@ -162,7 +162,7 @@ public class RayTracer {
 
 		
 		//TODO make sure there's no confusion between x and y, width and height etc.
-		RGB[][] RGBMatrix = new RGB[this.imageHeight][this.imageWidth];
+		RGB[][] RGBMatrix = new RGB[this.imageWidth][this.imageHeight];
 		
 		//TODO fill up the matrix
 		renderScene(RGBMatrix);
@@ -187,13 +187,13 @@ public class RayTracer {
 	private void renderScene(RGB[][] RGBMatrix) {
 		Camera cam = scene.getCamera();
 		
-		for (int i = 0; i < RGBMatrix.length; i++)
+		for (int i = 0; i < this.imageWidth; i++)
 		{
-			for (int j = 0; j < RGBMatrix.length; j++)
+			for (int j = 0; j < this.imageHeight; j++)
 			{
-//				Ray ray = cam.constructRayThroughPixel(i,j);
-//				Intersection hit = ray.findIntersection(scene);
-//				RGBMatrix[i][j] = hit.getColor();
+				Ray ray = cam.constructRayThroughPixel(i, j, imageWidth, imageHeight);
+				Intersection hit = ray.findIntersection(scene);
+				RGBMatrix[i][j] = hit.getColor();
 			}
 		}
 		

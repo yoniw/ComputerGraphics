@@ -32,6 +32,14 @@ public class VectorOperations {
 		return result;
 	}
 	
+	public static Vector add(Point p1, Point p2) {
+		return new Vector(
+				p1.getX() + p2.getX(),
+				p1.getY() + p2.getY(),
+				p1.getZ() + p2.getZ()
+				);
+	}
+	
 	/**
 	 * @return vector1 - vector2
 	 */
@@ -45,6 +53,15 @@ public class VectorOperations {
 		return result;
 	}
 	
+	public static Vector subtract(Point p1, Point p2) {
+		return new Vector(
+				p1.getX() - p2.getX(),
+				p1.getY() - p2.getY(),
+				p1.getZ() - p2.getZ()
+				);
+	}
+	
+	
 	public static double[] scalarMult(double scalar, double[] vector)
 	{
 		double[] result = vector;
@@ -53,6 +70,10 @@ public class VectorOperations {
 			result[i] *= scalar;
 		}
 		return result;
+	}
+
+	public static Vector scalarMult(double scalar, Vector vector) {
+		return new Vector(vector.getX() * scalar, vector.getY() * scalar, vector.getZ() * scalar);
 	}
 	
 	public static double dotProduct(double[] vector1, double[] vector2)
@@ -75,6 +96,14 @@ public class VectorOperations {
 		result[1]=(vector1[2]*vector2[0]) - (vector1[0]*vector2[2])  ;
 		result[2]=(vector1[0]*vector2[1]) - (vector1[1]*vector2[0])  ;
 		return result;
+	}
+
+	public static Vector crossProduct(Vector v1, Vector v2) {
+		return new Vector(
+				(v1.getY() * v2.getZ()) - (v1.getZ() * v2.getY()),
+				(v1.getZ() * v2.getX()) - (v1.getX() * v2.getZ()),
+				(v1.getX() * v2.getY()) - (v1.getY() * v2.getX())
+				);
 	}
 	
 }

@@ -2,9 +2,9 @@ package RayTracing;
 
 public class Point {
 
-	private double x;
-	private double y;
-	private double z;
+	protected double x;
+	protected double y;
+	protected double z;
 	
 	public Point(double x, double y, double z) {
 
