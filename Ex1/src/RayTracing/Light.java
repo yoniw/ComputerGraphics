@@ -16,4 +16,16 @@ public class Light {
 		shadowIntensity = Double.parseDouble(params[7]);
 		lightWidth = Double.parseDouble(params[8]);
 	}
+
+	public double[] getPosition() {
+		return position.getPointAsDoubleArr();
+	}
+
+	public double[] getColor() {
+		return colorRGB.getRGBAsDoubleArr();
+	}
+
+	public double getSpecularIntensity() {
+		return specularIntensity;
+	}
 }

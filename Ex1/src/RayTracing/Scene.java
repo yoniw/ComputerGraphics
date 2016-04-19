@@ -33,4 +33,8 @@ public class Scene {
 		return set;
 	}
 	
+	public List<Light> getLightsList()
+	{
+		return lightsList;
+	}
 }

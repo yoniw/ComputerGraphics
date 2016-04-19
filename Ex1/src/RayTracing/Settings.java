@@ -17,4 +17,13 @@ public class Settings {
 	{
 		return backgroundColorRGB;
 	}
+
+	public int getMaxNumberOfRecursions() {
+		return maxNumberOfRecursions;
+	}
+
+	public void minusOneReduction() {
+		maxNumberOfRecursions--;
+		
+	}
 }

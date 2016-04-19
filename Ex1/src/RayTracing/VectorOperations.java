@@ -45,6 +45,15 @@ public class VectorOperations {
 		return result;
 	}
 	
+	public static double[] multiply(double[] vector1, double[] vector2)
+	{
+		double[] result = new double[vector1.length];
+		for (int i = 0; i < result.length; i++)
+		{
+			result[i] = vector1[i]*vector2[i];
+		}
+		return result;
+	}
 	public static double[] scalarMult(double scalar, double[] vector)
 	{
 		double[] result = vector;
@@ -53,6 +62,11 @@ public class VectorOperations {
 			result[i] *= scalar;
 		}
 		return result;
+	}
+	
+	public static double[] invert(double[] vector)
+	{
+		return scalarMult(-1, vector);
 	}
 	
 	public static double dotProduct(double[] vector1, double[] vector2)

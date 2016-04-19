@@ -34,4 +34,12 @@ public class RGB {
 	{
 		return blue;
 	}
+
+	public double[] getRGBAsDoubleArr() {
+		double[] result = new double[3];
+		result[0] = red;
+		result[1] = green;
+		result[2] = blue;
+		return result;
+	}
 }
