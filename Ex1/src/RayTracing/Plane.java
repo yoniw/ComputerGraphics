@@ -1,6 +1,6 @@
 package RayTracing;
 
-public class Plane {
+public class Plane implements Surface{
 
 	private Point normal;
 	private double offset;

@@ -28,4 +28,13 @@ public class Scene {
 		return cam;
 	}
 	
+	public Settings getSettings()
+	{
+		return set;
+	}
+	
+	public List<Light> getLightsList()
+	{
+		return lightsList;
+	}
 }

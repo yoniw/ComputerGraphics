@@ -17,6 +17,11 @@ public class RGB {
 		this((byte)red, (byte)green, (byte)blue);
 	}
 	
+	public RGB(int[] rgbColors)
+	{
+		this(rgbColors[0], rgbColors[1], rgbColors[2]);
+	}
+	
 	public byte getRed()
 	{
 		return red;
@@ -28,5 +33,13 @@ public class RGB {
 	public byte getBlue()
 	{
 		return blue;
+	}
+
+	public double[] getRGBAsDoubleArr() {
+		double[] result = new double[3];
+		result[0] = red;
+		result[1] = green;
+		result[2] = blue;
+		return result;
 	}
 }
