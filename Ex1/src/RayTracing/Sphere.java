@@ -12,4 +12,25 @@ public class Sphere implements Surface{
 		radius = Double.parseDouble(params[3]);
 		materialIndex = Integer.parseInt(params[4]);
 	}
+	
+	@Override
+	public double getIntersection(Ray ray) {
+		
+		Vector l = VectorOperations.subtract(sphereCenter, ray.getP0());
+		
+		double t_ca = VectorOperations.dotProduct(l, ray.getV());
+		if (t_ca < 0) { 
+			// No intersection.
+			return -1;
+		}
+		
+		double d2 = VectorOperations.dotProduct(l, l) + (t_ca * t_ca);
+		if (d2 > (radius * radius)) {
+			// No intersection.
+			return -1;
+		}
+		
+		double t_hc = Math.sqrt((radius * radius) - d2);
+		return t_ca - t_hc;
+	}
 }
