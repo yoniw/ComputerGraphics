@@ -1,5 +1,6 @@
 package RayTracing;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class Scene {
@@ -36,5 +37,25 @@ public class Scene {
 	public List<Light> getLightsList()
 	{
 		return lightsList;
+	}
+	
+	public List<Sphere> getSpheresList() {
+		return spheresList;
+	}
+	
+	public List<Plane> getPlanesList() {
+		return planesList;
+	}
+	
+	public List<Cylinder> getCylindersList() {
+		return cylindersList;
+	}
+	
+	public List<Surface> getSurfaces() {
+		List<Surface> surfaces = new ArrayList<Surface>();
+		surfaces.addAll(spheresList);
+		surfaces.addAll(planesList);
+		surfaces.addAll(cylindersList);
+		return surfaces;
 	}
 }
