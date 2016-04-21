@@ -8,7 +8,7 @@ public class Settings {
 	
 	public Settings(String[] params)
 	{
-		backgroundColorRGB = new RGB(Integer.parseInt(params[0]), Integer.parseInt(params[1]), Integer.parseInt(params[2]));
+		backgroundColorRGB = new RGB(Double.parseDouble(params[0]), Double.parseDouble(params[1]), Double.parseDouble(params[2]));
 		rootNumberOfShadowRays = Integer.parseInt(params[3]);
 		maxNumberOfRecursions = Integer.parseInt(params[4]);
 	}
@@ -24,6 +24,5 @@ public class Settings {
 
 	public void minusOneReduction() {
 		maxNumberOfRecursions--;
-		
 	}
 }

@@ -51,6 +51,10 @@ public class Scene {
 		return cylindersList;
 	}
 	
+	public List<Material> getMaterialsList() {
+		return materialsList;
+	}
+	
 	public List<Surface> getSurfaces() {
 		List<Surface> surfaces = new ArrayList<Surface>();
 		surfaces.addAll(spheresList);

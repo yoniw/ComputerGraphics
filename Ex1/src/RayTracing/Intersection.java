@@ -6,7 +6,7 @@ import java.util.TreeMap;
 public class Intersection {
 
 	private Ray ray;
-	private Map<Double, Surface> intersections;
+	private TreeMap<Double, Surface> intersections;
 	
 	
 	public Intersection(Ray ray) {
@@ -25,5 +25,15 @@ public class Intersection {
 	
 	public Map<Double, Surface> getIntersections() {
 		return intersections;
+	}
+
+
+	public Surface getClosestIntersectedSurface() {
+		return intersections.firstEntry().getValue();
+	}
+
+
+	public Double getClosestDistance() {
+		return intersections.firstKey();
 	}
 }

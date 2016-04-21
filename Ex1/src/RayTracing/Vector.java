@@ -20,7 +20,10 @@ public class Vector extends Point {
 		this(p2.getX() - p1.getX(), p2.getY() - p1.getY(), p2.getZ() - p1.getZ());
 	}
 	
-
+	public Vector(Vector vector) {
+		this(vector.getX(), vector.getY(), vector.getZ());
+	}
+	
 	public void normalize() {
 		
 		this.x /= this.length;
@@ -45,4 +48,6 @@ public class Vector extends Point {
 	public double getLength() {
 		return length;
 	}
+
+
 }

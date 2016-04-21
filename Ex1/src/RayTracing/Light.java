@@ -17,12 +17,12 @@ public class Light {
 		lightWidth = Double.parseDouble(params[8]);
 	}
 
-	public double[] getPosition() {
-		return position.getPointAsDoubleArr();
+	public Point getPosition() {
+		return position;
 	}
 
-	public double[] getColor() {
-		return colorRGB.getRGBAsDoubleArr();
+	public RGB getColor() {
+		return colorRGB;
 	}
 
 	public double getSpecularIntensity() {

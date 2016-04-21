@@ -1,16 +1,16 @@
 package RayTracing;
 
-public class Plane implements Surface{
+public class Plane extends Surface{
 
 	private Vector normal;
 	private double offset;
-	private int materialIndex;
 	
 	public Plane(String[] params)
 	{
+		super(Integer.parseInt(params[4]));
 		normal = new Vector(Double.parseDouble(params[0]), Double.parseDouble(params[1]), Double.parseDouble(params[2]));
 		offset = Double.parseDouble(params[3]);
-		materialIndex = Integer.parseInt(params[4]);
+		
 	}
 	
 	@Override
@@ -29,5 +29,13 @@ public class Plane implements Surface{
 		}
 		
 		return t;
+	}
+
+
+
+	@Override
+	public Vector getNormal(Vector lightDirection, Point point, boolean withDirection) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }

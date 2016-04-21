@@ -22,6 +22,12 @@ public class VectorOperations {
 		return normalizedVector;
 	}
 	
+	public static Vector normalize(Vector vector)
+	{
+		//TODO
+		return null;
+	}
+	
 	public static double[] add(double[] vector1, double[] vector2)
 	{
 		double[] result = new double[vector1.length];
@@ -53,6 +59,10 @@ public class VectorOperations {
 		return result;
 	}
 	
+	/**
+	 * 
+	 * @return p1-p2
+	 */
 	public static Vector subtract(Point p1, Point p2) {
 		return new Vector(
 				p1.getX() - p2.getX(),
@@ -72,6 +82,10 @@ public class VectorOperations {
 		return result;
 	}
 	
+	public static RGB multiply(RGB rgb1, RGB rgb2)
+	{
+		return new RGB(rgb1.getRed()*rgb2.getRed(), rgb1.getGreen()*rgb2.getGreen(), rgb1.getBlue()*rgb2.getBlue());		
+	}
 	
 	public static double[] scalarMult(double scalar, double[] vector)
 	{
@@ -87,9 +101,18 @@ public class VectorOperations {
 		return new Vector(vector.getX() * scalar, vector.getY() * scalar, vector.getZ() * scalar);
 	}
 	
+	//TODO make sure this is a safe conversion
+	public static RGB scalarMult(double scalar, RGB rgb) {
+		return new RGB((byte)scalar*rgb.getRed(), (byte)scalar*rgb.getBlue(), (byte)scalar*rgb.getGreen());
+	}
+	
 	public static double[] invert(double[] vector)
 	{
 		return scalarMult(-1, vector);
+	}
+	
+	public static Vector invert(Vector normal) {
+		return scalarMult(-1, normal);
 	}
 	
 	public static double dotProduct(double[] vector1, double[] vector2)
@@ -128,6 +151,13 @@ public class VectorOperations {
 				(v1.getX() * v2.getY()) - (v1.getY() * v2.getX())
 				);
 	}
+
+	public static RGB add(RGB rgb1, RGB rgb2) {
+		return new RGB(rgb1.getRed() + rgb2.getRed(), rgb1.getGreen() + rgb2.getGreen(), rgb1.getBlue() + rgb2.getBlue());
+	}
+
+
+
 	
 }
 

@@ -7,6 +7,11 @@ public class RGB {
 	private byte blue;
 	
 
+	public RGB(double red, double green, double blue)
+	{
+		//TODO multiply by 255 and convert to byte
+	}
+	
 	public RGB(byte red, byte green, byte blue) {
 		this.red = red;
 		this.green = green;
@@ -35,11 +40,5 @@ public class RGB {
 		return blue;
 	}
 
-	public double[] getRGBAsDoubleArr() {
-		double[] result = new double[3];
-		result[0] = red;
-		result[1] = green;
-		result[2] = blue;
-		return result;
-	}
+
 }
