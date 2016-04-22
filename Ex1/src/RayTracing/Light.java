@@ -10,8 +10,8 @@ public class Light {
 	
 	public Light(String[] params)
 	{
-		position = new Point(Double.parseDouble(params[0]), Double.parseDouble(params[1]), Double.parseDouble(params[2]));
-		colorRGB = new RGB(Integer.parseInt(params[3]), Integer.parseInt(params[4]), Integer.parseInt(params[5]));
+		position = new Point(Float.parseFloat(params[0]),Float.parseFloat(params[1]), Float.parseFloat(params[2]));
+		colorRGB = new RGB(Float.parseFloat(params[3]), Float.parseFloat(params[4]), Float.parseFloat(params[5]));
 		specularIntensity = Double.parseDouble(params[6]);
 		shadowIntensity = Double.parseDouble(params[7]);
 		lightWidth = Double.parseDouble(params[8]);

@@ -8,7 +8,7 @@ public class Settings {
 	
 	public Settings(String[] params)
 	{
-		backgroundColorRGB = new RGB(Double.parseDouble(params[0]), Double.parseDouble(params[1]), Double.parseDouble(params[2]));
+		backgroundColorRGB = new RGB(Float.parseFloat(params[0]), Float.parseFloat(params[1]), Float.parseFloat(params[2]));
 		rootNumberOfShadowRays = Integer.parseInt(params[3]);
 		maxNumberOfRecursions = Integer.parseInt(params[4]);
 	}

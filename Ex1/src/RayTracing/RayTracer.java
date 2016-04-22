@@ -196,10 +196,7 @@ public class RayTracer {
 				
 			}
 		}
-		
-		
-		
-		
+
 	}
 
 	//TODO make sure there's no confusion between x and y, width and height etc.
@@ -209,9 +206,9 @@ public class RayTracer {
 		{
 			for (int y = 0; y < this.imageHeight; y++)
 			{
-				rgbData[(y * this.imageWidth + x) * 3] = RGBMatrix[x][y].getRed();
-				rgbData[(y * this.imageWidth + x) * 3 + 1] = RGBMatrix[x][y].getGreen();
-				rgbData[(y * this.imageWidth + x) * 3 + 2] = RGBMatrix[x][y].getBlue();
+				rgbData[(y * this.imageWidth + x) * 3] = (byte)RGBMatrix[x][y].getRed();
+				rgbData[(y * this.imageWidth + x) * 3 + 1] = (byte)RGBMatrix[x][y].getGreen();
+				rgbData[(y * this.imageWidth + x) * 3 + 2] = (byte)RGBMatrix[x][y].getBlue();
 			}
 		}
 		

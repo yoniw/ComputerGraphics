@@ -11,9 +11,9 @@ public class Material {
 	
 	public Material(String[] params)
 	{
-		diffuseColorRGB = new RGB(Integer.parseInt(params[0]), Integer.parseInt(params[1]), Integer.parseInt(params[2]));
-		specularColorRGB = new RGB(Integer.parseInt(params[3]), Integer.parseInt(params[4]), Integer.parseInt(params[5]));
-		reflectionColorRGB = new RGB(Integer.parseInt(params[6]), Integer.parseInt(params[7]), Integer.parseInt(params[8]));
+		diffuseColorRGB = new RGB(Float.parseFloat(params[0]), Float.parseFloat(params[1]), Float.parseFloat(params[2]));
+		specularColorRGB = new RGB(Float.parseFloat(params[3]), Float.parseFloat(params[4]), Float.parseFloat(params[5]));
+		reflectionColorRGB = new RGB(Float.parseFloat(params[6]), Float.parseFloat(params[7]), Float.parseFloat(params[8]));
 		phong = Double.parseDouble(params[9]);
 		transparency = Double.parseDouble(params[10]);
 		//incidence = Double.parseDouble(params[11]);
