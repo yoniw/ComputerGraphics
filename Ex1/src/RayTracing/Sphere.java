@@ -24,7 +24,7 @@ public class Sphere extends Surface{
 			return -1;
 		}
 		
-		double d2 = VectorOperations.dotProduct(l, l) + (t_ca * t_ca);
+		double d2 = VectorOperations.dotProduct(l, l) - (t_ca * t_ca);
 		if (d2 > (radius * radius)) {
 			// No intersection.
 			return -1;
