@@ -24,8 +24,9 @@ public class VectorOperations {
 	
 	public static Vector normalize(Vector vector)
 	{
-		//TODO
-		return null;
+		Vector copyOf = new Vector(vector);
+		copyOf.normalize();
+		return copyOf;
 	}
 	
 	public static double[] add(double[] vector1, double[] vector2)
@@ -71,6 +72,17 @@ public class VectorOperations {
 				);
 	}
 	
+	/**
+	 * 
+	 * @return p1-p2
+	 */
+	public static Vector subtract(Vector v1, Point p2) {
+		return new Vector(
+				v1.getX() - p2.getX(),
+				v1.getY() - p2.getY(),
+				v1.getZ() - p2.getZ()
+				);
+	}
 	
 	public static double[] multiply(double[] vector1, double[] vector2)
 	{
@@ -103,7 +115,7 @@ public class VectorOperations {
 	
 	//TODO make sure this is a safe conversion
 	public static RGB scalarMult(double scalar, RGB rgb) {
-		return new RGB((byte)scalar*rgb.getRed(), (byte)scalar*rgb.getBlue(), (byte)scalar*rgb.getGreen());
+		return new RGB(scalar*rgb.getRed(), scalar*rgb.getBlue(), scalar*rgb.getGreen());
 	}
 	
 	public static double[] invert(double[] vector)

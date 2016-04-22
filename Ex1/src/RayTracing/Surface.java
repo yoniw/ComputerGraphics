@@ -14,7 +14,7 @@ public abstract class Surface {
 	public Material getMaterial(Scene scene)
 	{
 		List<Material> materialsList = scene.getMaterialsList();
-		return materialsList.get(materialIndex);
+		return materialsList.get(materialIndex-1);
 	}
 	
 	public abstract double getIntersection(Ray ray);

@@ -206,9 +206,9 @@ public class RayTracer {
 		{
 			for (int y = 0; y < this.imageHeight; y++)
 			{
-				rgbData[(y * this.imageWidth + x) * 3] = (byte)RGBMatrix[x][y].getRed();
-				rgbData[(y * this.imageWidth + x) * 3 + 1] = (byte)RGBMatrix[x][y].getGreen();
-				rgbData[(y * this.imageWidth + x) * 3 + 2] = (byte)RGBMatrix[x][y].getBlue();
+				rgbData[(y * this.imageWidth + x) * 3] = (byte)(Math.floor(255*RGBMatrix[x][y].getRed()));
+				rgbData[(y * this.imageWidth + x) * 3 + 1] = (byte)(Math.floor(255*RGBMatrix[x][y].getGreen()));
+				rgbData[(y * this.imageWidth + x) * 3 + 2] = (byte)(Math.floor(255*RGBMatrix[x][y].getBlue()));
 			}
 		}
 		

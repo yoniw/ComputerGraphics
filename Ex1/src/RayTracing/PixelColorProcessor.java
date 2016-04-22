@@ -47,9 +47,9 @@ public class PixelColorProcessor {
 		//TODO ignore lights that don't hit the surface? 
 		for (Light light : lightsList)
 		{
-			resultColor = VectorOperations.add(resultColor, getOriginalDiffuseColor(scene, light, intersection));
-//			resultColor = VectorOperations.add(resultColor, getOriginalSpecularColor(scene, light, intersection));
-			
+			RGB diffuseColor = getOriginalDiffuseColor(scene, light, intersection);
+			RGB specularColor = getOriginalSpecularColor(scene, light, intersection);
+			resultColor = VectorOperations.add(specularColor, VectorOperations.add(resultColor, diffuseColor));
 		}
 		return resultColor;
 		
@@ -101,28 +101,45 @@ public class PixelColorProcessor {
 //		return VectorOperations.multiply(material.getReflectionColor(), computedColorReflection);
 //	}
 	
-//	private static RGB getOriginalSpecularColor(Scene scene, Light light, Intersection intersection) {
-//		Double closestDistance = intersection.getClosestDistance();
-//		Surface firstIntersectedObject = intersection.getClosestIntersectedSurface();
-//		Material material = firstIntersectedObject.getMaterial(scene);
-//		
-//		RGB basicSpecularColor = material.getSpecularColor();
-//		RGB basicSpecularColorMULTlightColor = VectorOperations.multiply(basicSpecularColor, light.getColor());
-//		
-//		Vector normalizedLightDirection = VectorOperations.normalize(VectorOperations.subtract(light.getPosition(), intersection.getRay().getPoint(closestDistance)));
-//		Vector reflectionVector = VectorOperations.subtract(normalizedLightDirection, intersection.getRay().getPoint(closestDistance));
-//		Vector normalToIntersectedObject = firstIntersectedObject.getNomral(reflectionVector);
-//		Vector reflectionDirection = VectorOperations.subtract( VectorOperations.scalarMult(VectorOperations.dotProduct(normalToIntersectedObject, normalizedLightDirection), normalToIntersectedObject), normalizedLightDirection);
-//		Vector normalizedReflectionDirection = VectorOperations.normalize(reflectionDirection);
-//		
-//		double angel = VectorOperations.dotProduct(VectorOperations.normalize(intersection.getRayDirection()), normalizedReflectionDirection);
-//		double angelPOWphong = Math.pow(angel, material.getPhong());
-//		double intensity = angelPOWphong * light.getSpecularIntensity();
-//		intensity = Math.abs(intensity); // intensity may come out negative
-//		
-//		return  VectorOperations.scalarMult(intensity, basicSpecularColorMULTlightColor);
-//		
-//	}
+	private static RGB getOriginalSpecularColor(Scene scene, Light light, Intersection intersection) {
+		Double closestDistance = intersection.getClosestDistance();
+		Surface firstIntersectedObject = intersection.getClosestIntersectedSurface();
+		Material material = firstIntersectedObject.getMaterial(scene);
+		
+		RGB basicSpecularColor = material.getSpecularColor();
+		RGB basicSpecularColorMULTlightColor = VectorOperations.multiply(basicSpecularColor, light.getColor());
+		
+		Vector normalizedLightDirection = VectorOperations.normalize(VectorOperations.subtract(light.getPosition(), intersection.getRay().getPoint(closestDistance)));
+		Vector reflectionVector = VectorOperations.subtract(normalizedLightDirection, intersection.getRay().getPoint(closestDistance));
+		Point intersectionPosition = intersection.getRay().getPoint(closestDistance);
+		Vector normalToIntersectedObject = firstIntersectedObject.getNormal(reflectionVector, VectorOperations.subtract(reflectionVector, intersectionPosition), true);
+
+		Vector reflectionDirection = VectorOperations.scalarMult(2, reflectionVector);
+		normalToIntersectedObject.normalize();
+		reflectionDirection = VectorOperations.scalarMult(VectorOperations.dotProduct(normalToIntersectedObject, reflectionDirection), normalToIntersectedObject);
+		reflectionDirection = VectorOperations.subtract(reflectionDirection, reflectionVector);
+		reflectionDirection.normalize();
+		
+		double angle = computeAngle(reflectionDirection, intersection);
+		double angelPOWphong = Math.pow(angle, material.getPhong());
+		double intensity = angelPOWphong * light.getSpecularIntensity();
+		
+		return  VectorOperations.scalarMult(intensity, basicSpecularColorMULTlightColor);
+	}
+
+	private static double computeAngle(Vector reflectionDirection, Intersection intersection) {
+		double angle;
+		Ray ray = intersection.getRay();
+		Vector invertedRayVector = VectorOperations.invert(ray.getV());
+		
+		invertedRayVector.normalize();
+		reflectionDirection.normalize();
+		if ((angle = VectorOperations.dotProduct(reflectionDirection, invertedRayVector)) > 0)
+		{
+			return angle;
+		}
+		return 0;
+	}
 
 	private static RGB getOriginalDiffuseColor(Scene scene, Light light, Intersection intersection) {
 		
