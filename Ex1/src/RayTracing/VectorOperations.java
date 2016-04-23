@@ -137,10 +137,10 @@ public class VectorOperations {
 		return result;
 	}
 	
-	public static double dotProduct(Vector v1, Vector v2) {
-		return v1.getX() * v2.getX()
-				+ v1.getY() * v2.getY()
-				+ v1.getZ() * v2.getZ();
+	public static double dotProduct(Point p1, Point p2) {
+		return p1.getX() * p2.getX()
+				+ p1.getY() * p2.getY()
+				+ p1.getZ() * p2.getZ();
 			
 	}
 	

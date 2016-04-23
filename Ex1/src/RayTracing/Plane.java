@@ -22,8 +22,9 @@ public class Plane extends Surface{
 			return -1;
 		}
 		
-		double v0 = (-1) * VectorOperations.dotProduct(normal, VectorOperations.add(ray.getP0(), new Vector(offset, offset, offset)));
-		double t = v0 / vd;
+		//double v0 = (-1) * VectorOperations.dotProduct(normal, VectorOperations.add(ray.getP0(), new Vector(offset, offset, offset)));
+		double v0 = VectorOperations.dotProduct(normal, ray.getP0());
+		double t = (-1 * v0 + offset) / vd;
 		if (t < 0) {
 			return -1;
 		}
