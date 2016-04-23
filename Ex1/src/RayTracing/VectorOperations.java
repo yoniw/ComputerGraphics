@@ -115,7 +115,7 @@ public class VectorOperations {
 	
 	//TODO make sure this is a safe conversion
 	public static RGB scalarMult(double scalar, RGB rgb) {
-		return new RGB(scalar*rgb.getRed(), scalar*rgb.getBlue(), scalar*rgb.getGreen());
+		return new RGB(scalar*rgb.getRed(), scalar*rgb.getGreen(), scalar*rgb.getBlue());
 	}
 	
 	public static double[] invert(double[] vector)

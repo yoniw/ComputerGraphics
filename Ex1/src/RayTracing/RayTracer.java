@@ -167,6 +167,9 @@ public class RayTracer {
 		//TODO fill up the matrix
 		renderScene(RGBMatrix);
 		
+		//TODO delete
+//		printMatrix(RGBMatrix,200,300);
+		
 		convertRGBMatrixtoByteArray(rgbData, RGBMatrix);
 		
 		long endTime = System.currentTimeMillis();
@@ -183,6 +186,43 @@ public class RayTracer {
 
 	}
 
+	//TODO delete
+	private void printMatrix(RGB[][] rGBMatrix, int start, int end) {
+		System.out.println("Reds:");
+		for (int i = start; i < end; i++)
+		{
+			for (int j = start; j < end; j++)
+			{
+				System.out.print(rGBMatrix[i][j].getRed() +" | ");
+			}
+			System.out.println();
+		}
+		
+		System.out.println();
+		System.out.println("Greens:");
+		for (int i = start; i < end; i++)
+		{
+			for (int j = start; j < end; j++)
+			{
+				System.out.print(rGBMatrix[i][j].getGreen() +" | ");
+			}
+			System.out.println();
+		}
+		
+		System.out.println();
+		System.out.println("Blues:");
+		for (int i = start; i < end; i++)
+		{
+			for (int j = start; j < end; j++)
+			{
+				System.out.print(rGBMatrix[i][j].getBlue() +" | ");
+			}
+			System.out.println();
+		}
+		
+		
+	}
+
 	private void renderScene(RGB[][] RGBMatrix) {
 		Camera cam = scene.getCamera();
 		ScreenSimulator screen = new ScreenSimulator(cam, imageWidth, imageHeight);
@@ -194,7 +234,8 @@ public class RayTracer {
 				// Ray ray = cam.constructRayThroughPixel(i, j, imageWidth, imageHeight);
 				Ray ray = new Ray(cam.getPosition(), screen.getCurrentV());
 				Intersection hit = ray.findIntersection(scene);
-				RGBMatrix[i][j] = PixelColorProcessor.getColor(scene, hit, null);
+				RGB tmp = PixelColorProcessor.getColor(scene, hit, null);
+				RGBMatrix[i][j] = tmp;
 				
 				screen.nextX();
 			}
@@ -211,9 +252,9 @@ public class RayTracer {
 		{
 			for (int y = 0; y < this.imageHeight; y++)
 			{
-				rgbData[(y * this.imageWidth + x) * 3] = (byte)(Math.floor(255*RGBMatrix[x][y].getRed()));
-				rgbData[(y * this.imageWidth + x) * 3 + 1] = (byte)(Math.floor(255*RGBMatrix[x][y].getGreen()));
-				rgbData[(y * this.imageWidth + x) * 3 + 2] = (byte)(Math.floor(255*RGBMatrix[x][y].getBlue()));
+				rgbData[(y * this.imageWidth + x) * 3] = (byte)(Math.floor(255*RGBMatrix[y][x].getRed()));
+				rgbData[(y * this.imageWidth + x) * 3 + 1] = (byte)(Math.floor(255*RGBMatrix[y][x].getGreen()));
+				rgbData[(y * this.imageWidth + x) * 3 + 2] = (byte)(Math.floor(255*RGBMatrix[y][x].getBlue()));
 			}
 		}
 		

@@ -112,12 +112,13 @@ public class PixelColorProcessor {
 		Vector normalizedLightDirection = VectorOperations.normalize(VectorOperations.subtract(light.getPosition(), intersection.getRay().getPoint(closestDistance)));
 		Vector reflectionVector = VectorOperations.subtract(normalizedLightDirection, intersection.getRay().getPoint(closestDistance));
 		Point intersectionPosition = intersection.getRay().getPoint(closestDistance);
-		Vector normalToIntersectedObject = firstIntersectedObject.getNormal(reflectionVector, VectorOperations.subtract(reflectionVector, intersectionPosition), true);
-
-		Vector reflectionDirection = VectorOperations.scalarMult(2, reflectionVector);
+		Vector normalToIntersectedObject = VectorOperations.invert(firstIntersectedObject.getNormal(reflectionVector, intersectionPosition, true));
+		
+		
+		Vector reflectionDirection = VectorOperations.scalarMult(2, normalizedLightDirection);
 		normalToIntersectedObject.normalize();
 		reflectionDirection = VectorOperations.scalarMult(VectorOperations.dotProduct(normalToIntersectedObject, reflectionDirection), normalToIntersectedObject);
-		reflectionDirection = VectorOperations.subtract(reflectionDirection, reflectionVector);
+		reflectionDirection = VectorOperations.subtract(reflectionDirection, normalizedLightDirection);
 		reflectionDirection.normalize();
 		
 		double angle = computeAngle(reflectionDirection, intersection);

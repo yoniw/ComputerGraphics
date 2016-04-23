@@ -9,9 +9,32 @@ public class RGB {
 
 	public RGB(double red, double green, double blue)
 	{
-		this.red = red;
-		this.green = green;
-		this.blue = blue;
+		// calculated colors might "overflow" 255
+		if (red > 1)
+		{
+			this.red = 1;
+		}
+		else
+		{
+			this.red = red;
+		}
+		if (green > 1)
+		{
+			this.green = 1;
+		}
+		else
+		{
+			this.green = green;
+
+		}
+		if (blue > 1)
+		{
+			this.blue = 1;
+		}
+		else
+		{
+			this.blue = blue;
+		}
 	}
 	
 //	public RGB(byte red, byte green, byte blue) {
