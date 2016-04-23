@@ -9,7 +9,7 @@ public class Vector extends Point {
 		
 		super(x, y, z);
 		
-		this.length = Math.sqrt(Math.pow(x, 2) + Math.pow(y, 2) + Math.pow(z, 2));
+		this.length = Math.sqrt(x * x + y * y + z * z);
 	}
 	
 	public Vector(double x1, double y1, double z1, double x2, double y2, double z2) {
@@ -26,9 +26,9 @@ public class Vector extends Point {
 	
 	public void normalize() {
 		
-		this.x /= this.length;
-		this.y /= this.length;
-		this.z /= this.length;
+		x = x / length;
+		y = y / length;
+		z = z / length;
 	}
 
 	

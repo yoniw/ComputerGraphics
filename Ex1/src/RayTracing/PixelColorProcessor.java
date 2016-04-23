@@ -9,7 +9,7 @@ public class PixelColorProcessor {
 	public static RGB getColor(Scene scene, Intersection intersection, Ray ray)
 	{
 			
-		if (intersection == null)
+		if ((intersection == null) || (intersection.getIntersections().isEmpty()))
 		{
 			// ray didn't hit any object
 			return scene.getSettings().getBackgroundColor();

@@ -7,7 +7,9 @@ public class Ray {
 
 	public Ray(Point p0, Vector v) {
 		this.p0 = p0;
-		this.v = v;
+		//this.v = v;
+		this.v = VectorOperations.subtract(v, p0);
+		this.v = VectorOperations.normalize(this.v);
 	}
 	
 	

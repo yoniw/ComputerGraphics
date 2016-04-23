@@ -55,4 +55,24 @@ public class Camera {
 	}
 	
 	
+	
+	public Point getPosition() {
+		return position;
+	}
+	
+	public double getScreenDistance() {
+		return screenDistance;
+	}
+	
+	public double getScreenWidth() {
+		return screenWidth;
+	}
+	
+	public Vector getUpVector() {
+		return upVector;
+	}
+	
+	public Vector getDirection() {
+		return direction;
+	}
 }
