@@ -28,12 +28,45 @@ public class Intersection {
 	}
 
 
-	public Surface getClosestIntersectedSurface() {
+	private Surface getClosestIntersectedSurface() {
 		return intersections.firstEntry().getValue();
 	}
 
 
-	public Double getClosestDistance() {
+	private Double getClosestDistance() {
 		return intersections.firstKey();
+	}
+
+
+//	public void removeClosestIntersection() {
+//		intersections.remove(getClosestDistance());
+//		
+//	}
+
+
+	public Surface getNthIntersectedSurface(int currRecursionDepth, int maxRecursionDepth) {
+		int counter = 0;
+		for (Map.Entry<Double, Surface> entry: intersections.entrySet())
+		{
+			if (counter == maxRecursionDepth - currRecursionDepth)
+			{
+				return entry.getValue();
+			}
+			counter++;
+		}
+		return getClosestIntersectedSurface();
+	}
+	
+	public Double getNthDistance(int currRecursionDepth, int maxRecursionDepth) {
+		int counter = 0;
+		for (Map.Entry<Double, Surface> entry: intersections.entrySet())
+		{
+			if (counter == maxRecursionDepth - currRecursionDepth)
+			{
+				return entry.getKey();
+			}
+			counter++;
+		}
+		return getClosestDistance();
 	}
 }

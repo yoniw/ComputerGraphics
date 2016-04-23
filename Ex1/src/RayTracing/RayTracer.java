@@ -234,8 +234,7 @@ public class RayTracer {
 				// Ray ray = cam.constructRayThroughPixel(i, j, imageWidth, imageHeight);
 				Ray ray = new Ray(cam.getPosition(), screen.getCurrentV());
 				Intersection hit = ray.findIntersection(scene);
-				RGB tmp = PixelColorProcessor.getColor(scene, hit, null);
-				RGBMatrix[i][j] = tmp;
+				RGBMatrix[i][j] = PixelColorProcessor.getColor(scene, hit, null, scene.getSettings().getMaxNumberOfRecursions());
 				
 				screen.nextX();
 			}

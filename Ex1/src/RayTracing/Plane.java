@@ -34,8 +34,8 @@ public class Plane extends Surface{
 
 
 	@Override
+	//TODO does withDirection flag has a meaning here? 
 	public Vector getNormal(Vector lightDirection, Point point, boolean withDirection) {
-		// TODO Auto-generated method stub
-		return null;
+		return VectorOperations.normalize(normal);
 	}
 }

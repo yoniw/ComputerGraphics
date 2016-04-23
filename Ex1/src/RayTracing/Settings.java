@@ -22,7 +22,5 @@ public class Settings {
 		return maxNumberOfRecursions;
 	}
 
-	public void minusOneReduction() {
-		maxNumberOfRecursions--;
-	}
+
 }
