@@ -5,6 +5,14 @@ public class Plane extends Surface{
 	private Vector normal;
 	private double offset;
 	
+	// an abstract plane. no need for a real material
+	public Plane(Vector normal, double offset)
+	{
+		super(0); 
+		this.normal = normal;
+		this.offset = offset;
+	}
+	
 	public Plane(String[] params)
 	{
 		super(Integer.parseInt(params[4]));
