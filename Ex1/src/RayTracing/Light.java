@@ -28,4 +28,12 @@ public class Light {
 	public double getSpecularIntensity() {
 		return specularIntensity;
 	}
+	
+	public double getShadowIntensity() {
+		return shadowIntensity;
+	}
+	
+	public double getLightWidth() {
+		return lightWidth;
+	}
 }

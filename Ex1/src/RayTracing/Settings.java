@@ -22,5 +22,7 @@ public class Settings {
 		return maxNumberOfRecursions;
 	}
 
-
+	public int getNumberOfShadowRays() {
+		return rootNumberOfShadowRays;
+	}
 }
