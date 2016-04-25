@@ -1,5 +1,6 @@
 package RayTracing;
 
+
 public class VectorOperations {
 
 	public static double getLength(double[] vector)
@@ -170,6 +171,14 @@ public class VectorOperations {
 
 
 
+	public static double getDistance(Point p1, Point p2)
+	{
+		double distance2 = (p1.getX() - p2.getX()) * (p1.getX() - p2.getX())
+				+ (p1.getY() - p2.getY()) * (p1.getY() - p2.getY())
+				+ (p1.getZ() - p2.getZ()) * (p1.getZ() - p2.getZ());
+
+		return Math.sqrt(distance2);
+	}
 	
 }
 

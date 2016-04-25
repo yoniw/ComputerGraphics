@@ -24,14 +24,32 @@ public class Cylinder extends Surface{
 		direction = MatrixRotation.rotateY(direction, yRotation);
 		direction = MatrixRotation.rotateZ(direction, zRotation);
 		
-		//base = VectorOperations.subtract(centerPosition, new Vector(length / 2, length / 2, length / 2));
-		base = centerPosition;
+		base = VectorOperations.add(centerPosition, new Vector(length / 2, length / 2, length / 2));
+		//base = centerPosition;
 	}
 
 
 
 	@Override
 	public double getIntersection(Ray ray) {
+		double t1 = getCylinderIntersection(ray);
+		double t2 = getCapsIntersection(ray);
+		
+		if ((t1 <= 0) && (t2 <= 0)) {
+			return -1;
+			
+		} else if (t1 <= 0) {
+			return t2;
+			
+		} else if (t2 <= 0) {
+			return t1;
+			
+		} else {
+			return Math.min(t1,  t2);
+		}
+	}
+	
+	private double getCylinderIntersection(Ray ray) {
 		// Preparing arguments for quadratic equation.
 		double vDP = VectorOperations.dotProduct(ray.getV(), direction);
 		Vector deltaP = VectorOperations.subtract(ray.getP0(), base);
@@ -76,8 +94,8 @@ public class Cylinder extends Surface{
 		
 		} else {
 			// Both solutions are valid.
-			boolean t0Intersection= hasFiniteIntersection(ray, t[0]);
-			boolean t1Intersection= hasFiniteIntersection(ray, t[1]);
+			boolean t0Intersection = hasFiniteIntersection(ray, t[0]);
+			boolean t1Intersection = hasFiniteIntersection(ray, t[1]);
 			
 			if (t0Intersection && t1Intersection) {
 				return Math.min(t[0], t[1]);
@@ -90,6 +108,62 @@ public class Cylinder extends Surface{
 			
 			} else {
 				// Intersection points exceeds cylinder length.
+				return -1;
+			}
+		}
+	}
+	
+	
+	private double getCapsIntersection(Ray ray) {
+		Ray cylinderRay = new Ray(centerPosition, direction);
+		
+		Point p1 = cylinderRay.getPoint((-1) * length / 2);
+		Plane pln1 = new Plane(direction, VectorOperations.dotProduct(direction, p1), materialIndex);
+		double t1 = pln1.getIntersection(ray);
+		double t1Distance = -1;
+		if (t1 > -1) {
+			Point t1Point = ray.getPoint(t1);
+			t1Distance = VectorOperations.getDistance(p1, t1Point);
+		}
+		
+		Point p2 = cylinderRay.getPoint(length / 2);
+		Plane pln2 = new Plane(direction, VectorOperations.dotProduct(direction, p2), materialIndex);
+		double t2 = pln2.getIntersection(ray);
+		double t2Distance = -1;
+		if (t2 > -1) {
+			Point t2Point = ray.getPoint(t2);
+			t2Distance = VectorOperations.getDistance(p2, t2Point);
+		}
+		
+		// Summarizing.
+		if ((t1 < 0) && (t2 < 0)) {
+			return -1;
+			
+		} else if (t1 < 0) {
+			if (t2Distance <= radius) {
+				return t2;
+			} else {
+				return -1;
+			}
+			
+		} else if (t2 < 0) {
+			if (t1Distance <= radius) {
+				return t1;
+			} else {
+				return -1;
+			}
+			
+		} else {
+			if ((t1Distance <= radius) && (t2Distance <= radius)) {
+				return Math.min(t1, t2);
+				
+			} else if (t1Distance <= radius) {
+				return t1;
+				
+			} else if (t2Distance <= radius) {
+				return t2;
+				
+			} else {
 				return -1;
 			}
 		}

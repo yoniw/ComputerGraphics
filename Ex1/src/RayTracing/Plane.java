@@ -21,6 +21,12 @@ public class Plane extends Surface{
 		
 	}
 	
+	public Plane(Vector normal, double offset, int material) {
+		super(material);
+		this.normal = normal;
+		this.offset = offset;
+	}
+	
 	@Override
 	public double getIntersection(Ray ray) {
 		

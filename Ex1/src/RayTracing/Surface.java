@@ -4,7 +4,7 @@ import java.util.List;
 
 public abstract class Surface {
 
-	int materialIndex;
+	protected int materialIndex;
 	
 	public Surface(int materialIndex)
 	{
