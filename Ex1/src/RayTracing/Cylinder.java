@@ -24,7 +24,8 @@ public class Cylinder extends Surface{
 		direction = MatrixRotation.rotateY(direction, yRotation);
 		direction = MatrixRotation.rotateZ(direction, zRotation);
 		
-		base = VectorOperations.subtract(centerPosition, direction);
+		//base = VectorOperations.subtract(centerPosition, new Vector(length / 2, length / 2, length / 2));
+		base = centerPosition;
 	}
 
 
@@ -34,6 +35,7 @@ public class Cylinder extends Surface{
 		// Preparing arguments for quadratic equation.
 		double vDP = VectorOperations.dotProduct(ray.getV(), direction);
 		Vector deltaP = VectorOperations.subtract(ray.getP0(), base);
+//		Vector deltaP = VectorOperations.subtract(ray.getP0(), centerPosition);
 		double pDP = VectorOperations.dotProduct(deltaP, direction);
 		
 		Vector aV = VectorOperations.subtract(ray.getV(), VectorOperations.scalarMult(vDP, direction));
@@ -54,17 +56,63 @@ public class Cylinder extends Surface{
 			// No intersection.
 			return -1;
 		
-		} else if ((t[0] >= 0) && (t[1] < 0)) {
+		} else if ((t[0] > 0) && (t[1] <= 0)) {
 			// Only first solution is valid.
-			return t[0];
+			if (hasFiniteIntersection(ray, t[0])) {
+				return t[0];
+			} else {
+				// Intersection point exceeds cylinder length.
+				return -1;
+			}
 			
-		} else if ((t[0] < 0) && (t[1] >= 0)) {
+		} else if ((t[0] <= 0) && (t[1] > 0)) {
 			// Only second solution is valid.
-			return t[1];
+			if (hasFiniteIntersection(ray, t[1])) {
+				return t[1];
+			} else {
+				// Intersection point exceeds cylinder length.
+				return -1;
+			}
 		
 		} else {
 			// Both solutions are valid.
-			return Math.min(t[0], t[1]);
+			boolean t0Intersection= hasFiniteIntersection(ray, t[0]);
+			boolean t1Intersection= hasFiniteIntersection(ray, t[1]);
+			
+			if (t0Intersection && t1Intersection) {
+				return Math.min(t[0], t[1]);
+				
+			} else if (t0Intersection) {
+				return t[0];
+				
+			} else if (t1Intersection) {
+				return t[1];
+			
+			} else {
+				// Intersection points exceeds cylinder length.
+				return -1;
+			}
+		}
+	}
+	
+	
+	private boolean hasFiniteIntersection(Ray ray, double t) {
+		
+		Point tP = ray.getPoint(t);
+		Vector vP = VectorOperations.subtract(tP, base);
+		
+		double distance = VectorOperations.dotProduct(direction, vP);
+		
+		if (distance > length) {
+			// Intersection point exceeds cylinder length.
+			return false;
+		
+		} else if (distance < 0) {
+			// Intersection point exceeds cylinder length.
+			return false;
+			
+		} else {
+			return true;
 		}
 	}
 
@@ -72,8 +120,21 @@ public class Cylinder extends Surface{
 
 	@Override
 	public Vector getNormal(Vector lightDirection, Point point, boolean withDirection) {
-		// TODO Auto-generated method stub
-		return null;
+		Vector normal = new Vector(centerPosition, point);
+		normal.normalize();
+		if (!withDirection)
+		{
+			return normal;
+		}
+		double cosAngel = VectorOperations.dotProduct(normal, lightDirection);
+		if (Math.acos(cosAngel) > 0.5*Math.PI)
+		{
+			return VectorOperations.invert(normal);
+		}
+		else
+		{
+			return normal;
+		}
 	}
 	
 	
