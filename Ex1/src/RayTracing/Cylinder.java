@@ -197,6 +197,16 @@ public class Cylinder extends Surface{
 
 	@Override
 	public Vector getNormal(Vector lightDirection, Point point, boolean withDirection) {
+		
+		// Checking if there is cap intersection, and if so, getting caps normal.
+		double d1 = VectorOperations.getDistance(point, cylinderLine.getPoint((-1) * length / 2));
+		double d2 = VectorOperations.getDistance(point, cylinderLine.getPoint(length / 2));
+		if ((d1 <= radius) || (d2 <= radius)) {
+			// Cap intersection.
+			return direction;
+		}
+		
+		// Getting cylinder normal
 		Vector normal = new Vector(centerPosition, point);
 		normal.normalize();
 		if (!withDirection)
