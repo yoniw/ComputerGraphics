@@ -4,37 +4,47 @@ import java.util.List;
 
 public class PixelColorProcessor {
 
-	private final double EPSILON = 0.0000000000001;
+	private final static double EPSILON = 0.0000000000001;
 	
-	public static RGB getColor(Scene scene, Intersection intersection, Ray ray, int currRecursionDepth)
+	public static RGB getColor(Scene scene, Intersection intersection, Ray reflectionRay, int currRecursionDepth)
 	{
-		System.out.println("current recursion depth: " + currRecursionDepth);	
-		if ((intersection == null) || (intersection.getIntersections().isEmpty()))
+		Intersection currIntersection;
+		if (reflectionRay == null)
+		{
+			currIntersection = intersection;
+		}
+		else
+		{
+			currIntersection = reflectionRay.findIntersection(scene);
+		}
+		
+		//System.out.println("current recursion depth: " + currRecursionDepth);	
+		if ((currIntersection == null) || (currIntersection.getIntersections().isEmpty()))
 		{
 			// ray didn't hit any object
 			return scene.getSettings().getBackgroundColor();
 		}
 		
-		RGB resultColor = getOriginalColor(scene, intersection, currRecursionDepth);
+		RGB resultColor = getOriginalColor(scene, currIntersection, currRecursionDepth);
 		
 		if (currRecursionDepth == 0)
 		{
 			return resultColor;
 		}
 	
-		Surface closestIntersectedObject = intersection.getNthIntersectedSurface(currRecursionDepth, scene.getSettings().getMaxNumberOfRecursions());
+		Surface closestIntersectedObject = currIntersection.getNthIntersectedSurface(currRecursionDepth, scene.getSettings().getMaxNumberOfRecursions());
 		Material material = closestIntersectedObject.getMaterial(scene);
 		
 		// transparency 
 		resultColor = VectorOperations.scalarMult((1-material.getTransparency()), resultColor);
-		RGB transparencyColor = computeTransparency(scene, intersection, currRecursionDepth);
+		RGB transparencyColor = computeTransparency(scene, currIntersection, currRecursionDepth);
 		transparencyColor = VectorOperations.scalarMult(material.getTransparency(), transparencyColor);
 		resultColor = VectorOperations.add(resultColor, transparencyColor);
 
 //		// reflection 
-//		RGB reflectionColor = computeReflectionColor(scene, intersection);
-//		resultColor = VectorOperations.add(resultColor, reflectionColor);
-//		
+		RGB reflectionColor = computeReflectionColor(scene, currIntersection, currRecursionDepth);
+		resultColor = VectorOperations.add(resultColor, reflectionColor);
+	
 		return resultColor;
 		
 	}
@@ -53,7 +63,7 @@ public class PixelColorProcessor {
 			RGB specularColor = getOriginalSpecularColor(scene, light, intersection, currRecursionDepth);
 			resultColor = VectorOperations.add(specularColor, VectorOperations.add(resultColor, diffuseColor));
 			// shadows
-			resultColor = VectorOperations.scalarMult(ShadowsCalculator.getIntensity(scene,intersection,light,currRecursionDepth), resultColor);
+//			resultColor = VectorOperations.scalarMult(ShadowsCalculator.getIntensity(scene,intersection,light,currRecursionDepth), resultColor);
 		}
 		return resultColor;
 		
@@ -74,31 +84,42 @@ public class PixelColorProcessor {
 		
 	}
 
-//	private static RGB computeReflectionColor(Scene scene, Intersection intersection) {
-//		Surface firstIntersectedObject = intersection.getIntersections().get(0);
-//		Material material = firstIntersectedObject.getMaterial(scene);
-//		RGB resultColor = new RGB(0,0,0);
-//		
-//		
-//		double[] reflectionColor = material.getReflectionColor().getRGBAsDoubleArr();
-//		if ((0 == reflectionColor[0]) && (0 == reflectionColor[1]) && (0== reflectionColor[2]))
-//		{
-//			return resultColor;
-//		}
-//		
-//		double[] reflectionVector = VectorOperations.subtract(intersection.getRayDirection(), intersection.getPosition());
-//		double[] normalToIntersectedObject = firstIntersectedObject.getNomral(reflectionVector);
-//		double[] reflectionDirection = VectorOperations.subtract( VectorOperations.scalarMult(VectorOperations.dotProduct(normalToIntersectedObject, normalizedLightDirection), normalToIntersectedObject), normalizedLightDirection);
-//		double[] normalizedReflectionDirection = VectorOperations.normalize(reflectionDirection);
-//		
-//		Ray reflectionRay = new Ray(normalizedReflectionDirection, intersection.getPosition());
-//		
-//		// TODO work with a recursionDepth param instead
-//		scene.getSettings().minusOneReduction();
-//		double[] computedColorReflection = getColor(scene, intersection, reflectionRay).getRGBAsDoubleArr();
-//		
-//		return VectorOperations.multiply(material.getReflectionColor(), computedColorReflection);
-//	}
+	private static RGB computeReflectionColor(Scene scene, Intersection intersection, int currRecursionDepth) {
+		Surface closestIntersectedObject = intersection.getNthIntersectedSurface(currRecursionDepth,scene.getSettings().getMaxNumberOfRecursions());
+		Double closestDistance = intersection.getNthDistance(currRecursionDepth, scene.getSettings().getMaxNumberOfRecursions());
+		Material material = closestIntersectedObject.getMaterial(scene);
+		
+		RGB resultColor = new RGB(0,0,0);
+		
+		
+		RGB reflectionColor = material.getReflectionColor();
+		if ((0 == reflectionColor.getRed()) && (0 == reflectionColor.getGreen()) && (0 == reflectionColor.getBlue()))
+		{
+			return resultColor;
+		}
+		
+		Ray ray = intersection.getRay();
+		Vector invertedRayVector = VectorOperations.invert(ray.getV());
+		Point intersectionPosition = intersection.getRay().getPoint(closestDistance);
+		Vector reflectionVector = VectorOperations.invert(VectorOperations.subtract(intersectionPosition, invertedRayVector));
+		Vector normalToReflection = closestIntersectedObject.getNormal(reflectionVector, intersectionPosition, true);
+		
+		
+		Vector reflectionDirection = VectorOperations.scalarMult(2, invertedRayVector);
+		normalToReflection.normalize();
+		reflectionDirection = VectorOperations.scalarMult(VectorOperations.dotProduct(normalToReflection, reflectionDirection), normalToReflection);
+		reflectionDirection = VectorOperations.subtract(reflectionDirection, invertedRayVector);
+		reflectionDirection.normalize();
+		
+		Point p0 = VectorOperations.add(intersectionPosition, reflectionDirection);
+		p0 = VectorOperations.scalarMult(EPSILON, p0); // so we wouldn't hit the same spot over and over
+		Point p1 = VectorOperations.add(p0, reflectionDirection);
+		Vector rayVector = new Vector(p0,p1);
+		
+		Ray reflectionRay = new Ray(p1, rayVector);
+		
+		return getColor(scene, intersection, reflectionRay, currRecursionDepth-1);
+	}
 	
 	private static RGB getOriginalSpecularColor(Scene scene, Light light, Intersection intersection, int currRecursionDepth) {
 		Double closestDistance = intersection.getNthDistance(currRecursionDepth, scene.getSettings().getMaxNumberOfRecursions());
