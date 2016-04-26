@@ -6,6 +6,8 @@ public class Cylinder extends Surface{
 	private Point centerPosition;
 	private double length;
 	private double radius;
+	
+	private Line cylinderLine;
 	private Vector direction;
 	private Point base;
 	
@@ -24,7 +26,9 @@ public class Cylinder extends Surface{
 		direction = MatrixRotation.rotateY(direction, yRotation);
 		direction = MatrixRotation.rotateZ(direction, zRotation);
 		
-		base = VectorOperations.add(centerPosition, new Vector(length / 2, length / 2, length / 2));
+		cylinderLine = new Line(centerPosition, direction);
+		
+		base = cylinderLine.getPoint((-1) * length / 2);
 		//base = centerPosition;
 	}
 
@@ -115,9 +119,8 @@ public class Cylinder extends Surface{
 	
 	
 	private double getCapsIntersection(Ray ray) {
-		Ray cylinderRay = new Ray(centerPosition, direction);
 		
-		Point p1 = cylinderRay.getPoint((-1) * length / 2);
+		Point p1 = cylinderLine.getPoint((-1) * length / 2);
 		Plane pln1 = new Plane(direction, VectorOperations.dotProduct(direction, p1), materialIndex);
 		double t1 = pln1.getIntersection(ray);
 		double t1Distance = -1;
@@ -126,7 +129,7 @@ public class Cylinder extends Surface{
 			t1Distance = VectorOperations.getDistance(p1, t1Point);
 		}
 		
-		Point p2 = cylinderRay.getPoint(length / 2);
+		Point p2 = cylinderLine.getPoint(length / 2);
 		Plane pln2 = new Plane(direction, VectorOperations.dotProduct(direction, p2), materialIndex);
 		double t2 = pln2.getIntersection(ray);
 		double t2Distance = -1;
