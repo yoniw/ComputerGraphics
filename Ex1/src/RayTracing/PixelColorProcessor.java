@@ -4,20 +4,12 @@ import java.util.List;
 
 public class PixelColorProcessor {
 
-	private final static double EPSILON = 0.0000000000001;
+	private final static double EPSILON = 0.0000001;
 	
 	public static RGB getColor(Scene scene, Intersection intersection, Ray reflectionRay, int currRecursionDepth)
 	{
-		Intersection currIntersection;
-		if (reflectionRay == null)
-		{
-			currIntersection = intersection;
-		}
-		else
-		{
-			currIntersection = reflectionRay.findIntersection(scene);
-		}
-		
+		Intersection currIntersection = (reflectionRay == null? intersection : reflectionRay.findIntersection(scene));
+		 
 		//System.out.println("current recursion depth: " + currRecursionDepth);	
 		if ((currIntersection == null) || (currIntersection.getIntersections().isEmpty()))
 		{
@@ -41,7 +33,7 @@ public class PixelColorProcessor {
 		transparencyColor = VectorOperations.scalarMult(material.getTransparency(), transparencyColor);
 		resultColor = VectorOperations.add(resultColor, transparencyColor);
 
-//		// reflection 
+		// reflection 
 		RGB reflectionColor = computeReflectionColor(scene, currIntersection, currRecursionDepth);
 		resultColor = VectorOperations.add(resultColor, reflectionColor);
 	
@@ -104,7 +96,7 @@ public class PixelColorProcessor {
 		Vector reflectionVector = VectorOperations.invert(VectorOperations.subtract(intersectionPosition, invertedRayVector));
 		Vector normalToReflection = closestIntersectedObject.getNormal(reflectionVector, intersectionPosition, true);
 		
-		
+
 		Vector reflectionDirection = VectorOperations.scalarMult(2, invertedRayVector);
 		normalToReflection.normalize();
 		reflectionDirection = VectorOperations.scalarMult(VectorOperations.dotProduct(normalToReflection, reflectionDirection), normalToReflection);

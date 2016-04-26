@@ -48,6 +48,13 @@ public class VectorOperations {
 				);
 	}
 	
+	public static Vector add(Point p1, Vector v1) {
+		return new Vector(
+				p1.getX() + v1.getX(),
+				p1.getY() + v1.getY(),
+				p1.getZ() + v1.getZ()
+				);
+	}
 	/**
 	 * @return vector1 - vector2
 	 */
