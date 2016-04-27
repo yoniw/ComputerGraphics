@@ -59,17 +59,17 @@ public class ShadowsCalculator {
 	}
 	
 
-	private double getTotalShadows(Surface intersectedSurface, Point intersectionPoint, Vector shadow) {
+	private double getTotalShadows(Surface intersectedSurface, Point intersectionPoint, Point shadowPoint) {
 
-		Ray shadowRay = new Ray(shadow, new Vector(intersectionPoint));
+		Ray shadowRay = new Ray(shadowPoint, new Vector(intersectionPoint));
 		
 		Intersection hit = shadowRay.findIntersection(scene);
 		if (hit.getIntersections().isEmpty()) {
 			return 1;
 		}
 		
-		Vector shadowHitVector = VectorOperations.subtract(shadowRay.getPoint(hit.getNthDistance(0, scene.getSettings().getMaxNumberOfRecursions())), shadow);
-		Vector intersectionHitVector = VectorOperations.subtract(intersectionPoint, shadow);
+		Vector shadowHitVector = VectorOperations.subtract(shadowRay.getPoint(hit.getNthDistance(0, scene.getSettings().getMaxNumberOfRecursions())), shadowPoint);
+		Vector intersectionHitVector = VectorOperations.subtract(intersectionPoint, shadowPoint);
 		
 		if (shadowHitVector.getLength() > intersectionHitVector.getLength()) {
 			// Between light and intersected object, so it does not affect.
