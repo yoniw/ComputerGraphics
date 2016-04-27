@@ -43,6 +43,7 @@ public class PixelColorProcessor {
 		RGB resultColor = new RGB(0,0,0);
 		
 		List<Light> lightsList = scene.getLightsList();
+		ShadowsCalculator shadowsCalc = new ShadowsCalculator(scene);
 		
 		//TODO ignore lights that don't hit the surface? 
 		for (Light light : lightsList)
@@ -53,7 +54,7 @@ public class PixelColorProcessor {
 			RGB specularColor = getOriginalSpecularColor(scene, light, intersection, currRecursionDepth);
 			resultColor = VectorOperations.add(specularColor, VectorOperations.add(resultColor, diffuseColor));
 			// shadows
-			resultColor = VectorOperations.scalarMult(ShadowsCalculator.getIntensity(scene,intersection,light,currRecursionDepth), resultColor);
+			resultColor = VectorOperations.scalarMult(shadowsCalc.getIntensity(intersection,light,currRecursionDepth), resultColor);
 		}
 		return resultColor;
 		
@@ -159,6 +160,4 @@ public class PixelColorProcessor {
 		RGB lightColorMULTdiffuseColor = VectorOperations.multiply(lightColor, materialOriginalDiffuseColor);
 		return VectorOperations.scalarMult(intensity, lightColorMULTdiffuseColor);
 	}
-	
-	
 }

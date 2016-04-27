@@ -1,62 +1,97 @@
 package RayTracing;
 
-import java.util.List;
 import java.util.Random;
 
 public class ShadowsCalculator {
-
-	private static Random random = new Random();
 	
-	public static double getIntensity(Scene scene, Intersection intersection, Light light, int currRecursionDepth) {
-		Double closestDistance = intersection.getNthDistance(currRecursionDepth, scene.getSettings().getMaxNumberOfRecursions());
+	private final double EPSILON = 0.0000000000001;
+
+	private Scene scene;
+	private Random random;
+	
+	
+	public ShadowsCalculator(Scene scene) {
+
+		this.scene = scene;
+		this.random = new Random();
+	}
+	
+	
+	public double getIntensity(Intersection intersection, Light light, int currRecursionDepth) {
+
 		int numShadowRays = scene.getSettings().getNumberOfShadowRays();
+
+		Double closestDistance = intersection.getNthDistance(currRecursionDepth, scene.getSettings().getMaxNumberOfRecursions());
+		Surface intersectedSurface = intersection.getNthIntersectedSurface(currRecursionDepth, scene.getSettings().getMaxNumberOfRecursions());
+		Point intersectionPoint = intersection.getRay().getPoint(closestDistance);
+		Vector lightVector = VectorOperations.subtract(light.getPosition(), intersectionPoint);
+		lightVector = VectorOperations.scalarMult(-1, lightVector);
+		lightVector.normalize();
 		
-		Plane perpendicularPlane = getPerpendicularPlane(scene, intersection, light, currRecursionDepth);
 		
-		//TODO  define a rectangle on perpendicularPlane centered at the light source ??
+		ScreenSimulator screen = new ScreenSimulator(scene.getCamera(), light, lightVector, numShadowRays);
 		
 		double totalNumHits = 0;
 		
-		for (int i = 0; i < numShadowRays; i++)
-		{
-			for (int j = 0; j < numShadowRays; j++)
-			{
-				double randIScalar = (i+random.nextDouble())/numShadowRays;
-				double randJScalar = (j+random.nextDouble())/numShadowRays;
+		for (int i = 0; i < numShadowRays; i++) {
+			screen.initCurrentV();
+			
+			for (int j = 0; j < numShadowRays; j++) {
 				
-				Vector v = null; //TODO calculate v using perpendicularPlane, randIScalar and randJScalar
-				Point p0 = intersection.getRay().getPoint(closestDistance);
+				double randIScalar = (i + random.nextDouble()) / numShadowRays;
+				double randJScalar = (j + random.nextDouble()) / numShadowRays;
 				
-				Ray shadowRay = new Ray(p0, v);
+				Vector shadow = screen.getCurrentV();
+				shadow = VectorOperations.add(shadow, VectorOperations.scalarMult(randIScalar, screen.getXDiff()));
+				shadow = VectorOperations.add(shadow, VectorOperations.scalarMult(randJScalar, screen.getYDiff()));
 				
-				double totalShadows = 0;			
-				List<Surface> intersectedSurfaces = null; //TODO use shadowRay to intersect surfaces
-				for (Surface surface : intersectedSurfaces)
-				{
-					//TODO
-				}
-				totalNumHits += totalShadows;
+				totalNumHits += getTotalShadows(intersectedSurface, intersectionPoint, shadow);
+				
+				screen.nextX();
 			}
+			
+			screen.nextY();
 		}
 		
-		// TODO 
-		return 1;
+		double hitPercent = totalNumHits / (numShadowRays * numShadowRays);
 		
+		return 1 - ((1 - hitPercent) * light.getShadowIntensity());
 	}
-
 	
-	// TODO
-	private static Plane getPerpendicularPlane(Scene scene, Intersection intersection, Light light, int currRecursionDepth) {
-		Double closestDistance = intersection.getNthDistance(currRecursionDepth, scene.getSettings().getMaxNumberOfRecursions());
-		
-		Vector lightIntersectionVector = VectorOperations.subtract(intersection.getRay().getPoint(closestDistance), light.getPosition());
-		double offset = VectorOperations.dotProduct(lightIntersectionVector, light.getPosition());
-		
-		
-		//TODO 
-		
-		
-		return new Plane(null,offset);
-	}
 
+	private double getTotalShadows(Surface intersectedSurface, Point intersectionPoint, Vector shadow) {
+
+		Ray shadowRay = new Ray(intersectionPoint, shadow);
+		
+		Intersection hit = shadowRay.findIntersection(scene);
+		if (hit.getIntersections().isEmpty()) {
+			return 1;
+		}
+		
+		Vector shadowHitVector = VectorOperations.subtract(shadowRay.getPoint(hit.getNthDistance(0, scene.getSettings().getMaxNumberOfRecursions())), shadow);
+		Vector intersectionHitVector = VectorOperations.subtract(intersectionPoint, shadow);
+		
+		if (shadowHitVector.getLength() > intersectionHitVector.getLength()) {
+			// Between light and intersected object, so it does not affect.
+			return 1;
+			
+		} else if (Math.abs(shadowHitVector.getLength() - intersectionHitVector.getLength()) < EPSILON) {
+			// Intersected object is same object. Skipping.
+			return 1;
+		}
+		
+		
+		double totalShadows = 1;
+		
+		for (Surface surface : hit.getIntersections().values()) {
+			if (surface == intersectedSurface) {
+				// Intersected with current surface, all other surfaces are hidden.
+				break;
+			}
+			
+			totalShadows = totalShadows * surface.getMaterial(scene).getTransparency();
+		}
+		
+		return totalShadows;
+	}
 }

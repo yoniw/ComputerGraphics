@@ -26,6 +26,22 @@ public class ScreenSimulator {
 	}
 	
 	
+	public ScreenSimulator(Camera camera, Light light, Vector lightVector, double numShadowRays) {
+		
+		Vector xAxis = VectorOperations.crossProduct(camera.getUpVector(), lightVector);
+		Vector yAxis = VectorOperations.crossProduct(xAxis, lightVector);
+		
+		// Calculating start vector.
+		double lightRadius = light.getLightWidth() / 2;
+		double pixelSize = light.getLightWidth() / numShadowRays;
+		v = VectorOperations.subtract(light.getPosition(), VectorOperations.scalarMult(lightRadius, xAxis));
+		v = VectorOperations.subtract(v, VectorOperations.scalarMult(lightRadius, yAxis));
+		
+		xDiff = VectorOperations.scalarMult(pixelSize, xAxis);
+		yDiff = VectorOperations.scalarMult(pixelSize, yAxis);
+	}
+	
+	
 	public void initCurrentV() {
 		currentV = v;
 	}
@@ -34,11 +50,21 @@ public class ScreenSimulator {
 		return currentV;
 	}
 	
+	
 	public void nextX() {
 		currentV = VectorOperations.add(currentV, xDiff);
 	}
 	
 	public void nextY() {
 		v = VectorOperations.add(v, yDiff);
+	}
+	
+	
+	public Vector getXDiff() {
+		return xDiff;
+	}
+	
+	public Vector getYDiff() {
+		return yDiff;
 	}
 }
