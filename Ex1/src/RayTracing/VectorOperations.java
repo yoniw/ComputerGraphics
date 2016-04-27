@@ -48,6 +48,13 @@ public class VectorOperations {
 				);
 	}
 	
+	public static Vector add(Point p1, Vector v1) {
+		return new Vector(
+				p1.getX() + v1.getX(),
+				p1.getY() + v1.getY(),
+				p1.getZ() + v1.getZ()
+				);
+	}
 	/**
 	 * @return vector1 - vector2
 	 */
@@ -114,9 +121,13 @@ public class VectorOperations {
 		return new Vector(vector.getX() * scalar, vector.getY() * scalar, vector.getZ() * scalar);
 	}
 	
-	//TODO make sure this is a safe conversion
+
 	public static RGB scalarMult(double scalar, RGB rgb) {
 		return new RGB(scalar*rgb.getRed(), scalar*rgb.getGreen(), scalar*rgb.getBlue());
+	}
+	
+	public static Point scalarMult(double scalar, Point p0) {
+		return new Point(scalar*p0.getX(), scalar*p0.getY(), scalar*p0.getZ());
 	}
 	
 	public static double[] invert(double[] vector)
@@ -179,6 +190,8 @@ public class VectorOperations {
 
 		return Math.sqrt(distance2);
 	}
+
+
 	
 }
 
