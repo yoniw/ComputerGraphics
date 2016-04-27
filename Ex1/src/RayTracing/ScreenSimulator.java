@@ -32,10 +32,9 @@ public class ScreenSimulator {
 		Vector yAxis = VectorOperations.crossProduct(xAxis, lightVector);
 		
 		// Calculating start vector.
-		double lightRadius = light.getLightWidth() / 2;
 		double pixelSize = light.getLightWidth() / numShadowRays;
-		v = VectorOperations.subtract(light.getPosition(), VectorOperations.scalarMult(lightRadius, xAxis));
-		v = VectorOperations.subtract(v, VectorOperations.scalarMult(lightRadius, yAxis));
+		v = VectorOperations.subtract(light.getPosition(), VectorOperations.scalarMult(light.getLightWidth(), xAxis));
+		v = VectorOperations.subtract(v, VectorOperations.scalarMult(light.getLightWidth(), yAxis));
 		
 		xDiff = VectorOperations.scalarMult(pixelSize, xAxis);
 		yDiff = VectorOperations.scalarMult(pixelSize, yAxis);

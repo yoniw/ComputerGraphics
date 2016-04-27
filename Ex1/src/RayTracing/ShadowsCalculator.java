@@ -57,68 +57,7 @@ public class ShadowsCalculator {
 		
 		return 1 - ((1 - hitPercent) * light.getShadowIntensity());
 	}
-	
-
-	public double getShadowCoeff(Light light, Intersection intersection, int currRecursionDepth) {
-
-		int numShadowRays = scene.getSettings().getNumberOfShadowRays();
-
-		double closestDistance = intersection.getNthDistance(currRecursionDepth, scene.getSettings().getMaxNumberOfRecursions());
-		Point intersectionPoint = intersection.getRay().getPoint(closestDistance);
-		Vector lightVector = new Vector(light.getPosition(), intersectionPoint);
 		
-		double planeOffset = VectorOperations.dotProduct(lightVector, light.getPosition());
-		Vector planeVector1 = getPlaneVector(lightVector, planeOffset);
-		planeVector1.normalize();
-		planeVector1 = VectorOperations.scalarMult(light.getLightWidth() / 2, planeVector1);
-		Vector planeVector2 = VectorOperations.crossProduct(lightVector, planeVector1);
-		planeVector2.normalize();
-		planeVector2 = VectorOperations.scalarMult(light.getLightWidth() / 2, planeVector2);
-		Vector rectStart = VectorOperations.subtract(light.getPosition(), VectorOperations.scalarMult(0.5, planeVector1));
-		rectStart = VectorOperations.subtract(rectStart, VectorOperations.scalarMult(0.5, planeVector1));
-		Random r = new Random();
-		double numOfHits = 0;
-		for (int i = 0; i < numShadowRays; i++) {
-			for (int j = 0; j < numShadowRays; j++) {
-				double coeff1 = r.nextDouble();
-				double coeff2 = r.nextDouble();
-				Vector rayStart = VectorOperations.add(rectStart, VectorOperations.scalarMult((i + coeff1) / numShadowRays, planeVector1));
-				rayStart = VectorOperations.add(rayStart, VectorOperations.scalarMult((j + coeff2) / numShadowRays, planeVector2));
-				Ray ray = new Ray(rayStart, new Vector(intersectionPoint));
-
-				double acummelateShadow = 1;
-				double distanceToLight = VectorOperations.getDistance(intersectionPoint, rayStart) - EPSILON; //epsilon
-
-				Intersection hit = ray.findIntersection(scene);
-				for (double t : hit.getIntersections().keySet()) {
-					intersectionPoint = hit.getRay().getPoint(t);
-					if (VectorOperations.getDistance(intersectionPoint, rayStart) < distanceToLight) {
-						acummelateShadow *= hit.getIntersections().get(t).getMaterial(scene).getTransparency();
-					}
-				}
-				numOfHits += acummelateShadow;
-
-			}
-		}
-
-		return 1-light.getShadowIntensity() + light.getShadowIntensity()*numOfHits/(numShadowRays*numShadowRays);
-	}
-	
-    private Vector getPlaneVector(Vector normal, double offset){
-        double x=0,y=0,z=0;
-
-        if (normal.getZ() != 0) {
-            z = offset ;
-        }
-        else if(normal.getY() != 0) {
-            y = offset;
-        }
-        else {
-            x = offset;
-        }
-        return new Vector(x,y,z);
-    }
-	
 
 	private double getTotalShadows(Surface intersectedSurface, Point intersectionPoint, Point shadowPoint) {
 
