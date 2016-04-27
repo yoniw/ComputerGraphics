@@ -61,7 +61,7 @@ public class ShadowsCalculator {
 
 	private double getTotalShadows(Surface intersectedSurface, Point intersectionPoint, Vector shadow) {
 
-		Ray shadowRay = new Ray(intersectionPoint, shadow);
+		Ray shadowRay = new Ray(shadow, new Vector(intersectionPoint));
 		
 		Intersection hit = shadowRay.findIntersection(scene);
 		if (hit.getIntersections().isEmpty()) {
