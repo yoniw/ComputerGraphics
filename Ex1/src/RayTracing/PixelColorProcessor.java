@@ -4,9 +4,9 @@ import java.util.List;
 
 public class PixelColorProcessor {
 
-	private final static double EPSILON = 0.00001;
+	private final double EPSILON = 0.00001;
 	
-	public static RGB getColor(Scene scene, Intersection intersection, Ray reflectionRay, int currRecursionDepth)
+	public RGB getColor(Scene scene, Intersection intersection, Ray reflectionRay, int currRecursionDepth)
 	{
 		Intersection currIntersection = (reflectionRay == null? intersection : reflectionRay.findIntersection(scene));
 		 
@@ -41,7 +41,7 @@ public class PixelColorProcessor {
 		
 	}
 
-	private static RGB getOriginalColor(Scene scene, Intersection intersection, int currRecursionDepth, Ray reflectionRay) {	
+	private RGB getOriginalColor(Scene scene, Intersection intersection, int currRecursionDepth, Ray reflectionRay) {	
 		RGB resultColor = new RGB(0,0,0);
 		
 		List<Light> lightsList = scene.getLightsList();
@@ -68,7 +68,7 @@ public class PixelColorProcessor {
 	}
 	
 	//checks whether light is visible in the given intersection
-	private static boolean doesLightHit(Scene scene, Light light, Intersection intersection, int currRecursionDepth) {
+	private boolean doesLightHit(Scene scene, Light light, Intersection intersection, int currRecursionDepth) {
 		Vector rayVector = intersection.getRay().getV();
 		Double closestDistance = intersection.getNthDistance(currRecursionDepth, scene.getSettings().getMaxNumberOfRecursions());
 		Point intersectionPosition = intersection.getRay().getPoint(closestDistance);
@@ -88,7 +88,7 @@ public class PixelColorProcessor {
 		return true;
 	}
 
-	private static RGB computeTransparency(Scene scene, Intersection intersection, int currRecursionDepth) {
+	private RGB computeTransparency(Scene scene, Intersection intersection, int currRecursionDepth) {
 		
 		Surface closestIntersectedObject = intersection.getNthIntersectedSurface(currRecursionDepth,scene.getSettings().getMaxNumberOfRecursions());
 		Material material = closestIntersectedObject.getMaterial(scene);
@@ -103,7 +103,7 @@ public class PixelColorProcessor {
 		
 	}
 
-	private static RGB computeReflectionColor(Scene scene, Intersection intersection, int currRecursionDepth) {
+	private RGB computeReflectionColor(Scene scene, Intersection intersection, int currRecursionDepth) {
 		Surface closestIntersectedObject = intersection.getNthIntersectedSurface(currRecursionDepth,scene.getSettings().getMaxNumberOfRecursions());
 		Double closestDistance = intersection.getNthDistance(currRecursionDepth, scene.getSettings().getMaxNumberOfRecursions());
 		Material material = closestIntersectedObject.getMaterial(scene);
@@ -136,7 +136,7 @@ public class PixelColorProcessor {
 		return VectorOperations.multiply(reflectionColor,getColor(scene, intersection, reflectionRay, currRecursionDepth-1));
 	}
 	
-	private static RGB getOriginalSpecularColor(Scene scene, Light light, Intersection intersection, int currRecursionDepth) {
+	private RGB getOriginalSpecularColor(Scene scene, Light light, Intersection intersection, int currRecursionDepth) {
 		Double closestDistance = intersection.getNthDistance(currRecursionDepth, scene.getSettings().getMaxNumberOfRecursions());
 		Surface firstIntersectedObject = intersection.getNthIntersectedSurface(currRecursionDepth, scene.getSettings().getMaxNumberOfRecursions());
 		Material material = firstIntersectedObject.getMaterial(scene);
@@ -163,7 +163,7 @@ public class PixelColorProcessor {
 		return  VectorOperations.scalarMult(intensity, basicSpecularColorMULTlightColor);
 	}
 
-	private static double computeAngle(Vector reflectionDirection, Intersection intersection) {
+	private double computeAngle(Vector reflectionDirection, Intersection intersection) {
 		double angle;
 		Ray ray = intersection.getRay();
 		Vector invertedRayVector = VectorOperations.invert(ray.getV());
@@ -177,7 +177,7 @@ public class PixelColorProcessor {
 		return 0;
 	}
 
-	private static RGB getOriginalDiffuseColor(Scene scene, Light light, Intersection intersection, int currRecursionDepth) {
+	private RGB getOriginalDiffuseColor(Scene scene, Light light, Intersection intersection, int currRecursionDepth) {
 		
 		Double closestDistance = intersection.getNthDistance(currRecursionDepth, scene.getSettings().getMaxNumberOfRecursions());
 		Surface firstIntersectedObject = intersection.getNthIntersectedSurface(currRecursionDepth, scene.getSettings().getMaxNumberOfRecursions());

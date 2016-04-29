@@ -226,6 +226,7 @@ public class RayTracer {
 	private void renderScene(RGB[][] RGBMatrix) {
 		Camera cam = scene.getCamera();
 		ScreenSimulator screen = new ScreenSimulator(cam, imageWidth, imageHeight);
+		PixelColorProcessor pixelCP = new PixelColorProcessor();
 		
 		for (int i = 0; i < this.imageWidth; i++) {
 			screen.initCurrentV();
@@ -234,7 +235,7 @@ public class RayTracer {
 				// Ray ray = cam.constructRayThroughPixel(i, j, imageWidth, imageHeight);
 				Ray ray = new Ray(cam.getPosition(), screen.getCurrentV());
 				Intersection hit = ray.findIntersection(scene);
-				RGBMatrix[i][j] = PixelColorProcessor.getColor(scene, hit, null, scene.getSettings().getMaxNumberOfRecursions());
+				RGBMatrix[i][j] = pixelCP.getColor(scene, hit, null, scene.getSettings().getMaxNumberOfRecursions());
 				
 				screen.nextX();
 			}
