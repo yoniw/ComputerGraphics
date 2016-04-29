@@ -99,7 +99,6 @@ public class ShadowsCalculator {
 
 	public double myGetIntensity(Intersection intersection, Light light, int currRecursionDepth) {
 		Double closestDistance = intersection.getNthDistance(currRecursionDepth, scene.getSettings().getMaxNumberOfRecursions());
-		closestDistance = intersection.getClosestDistance();
 		Point intersectionPosition = intersection.getRay().getPoint(closestDistance);
 		
         Vector toIntersection = new Vector(light.getPosition(), intersectionPosition);
