@@ -109,23 +109,31 @@ public class PixelColorProcessor {
 		Material material = closestIntersectedObject.getMaterial(scene);
 		
 		RGB resultColor = new RGB(0,0,0);
-		
-		
+	
 		RGB reflectionColor = material.getReflectionColor();
 		if ((0 == reflectionColor.getRed()) && (0 == reflectionColor.getGreen()) && (0 == reflectionColor.getBlue()))
 		{
 			return resultColor;
 		}
-		
-		//TODO change variables names
-		Vector V = intersection.getRay().getV(); 
+
+		Vector invertedRayVector = VectorOperations.invert(intersection.getRay().getV()); 
 		Point intersectionPosition = intersection.getRay().getPoint(closestDistance);
-		Vector N = closestIntersectedObject.getNormal(V, intersectionPosition, true); 
-		Vector R = VectorOperations.subtract(V, VectorOperations.scalarMult(2*VectorOperations.dotProduct(V, N), N));
-		Vector rayVector = VectorOperations.subtract(VectorOperations.add(intersectionPosition,R), VectorOperations.add(VectorOperations.scalarMult(EPSILON, R), intersectionPosition));
-		Ray reflectionRay = new Ray(VectorOperations.scalarMult(EPSILON, rayVector), R);
-		return VectorOperations.multiply(reflectionColor,getColor(scene, intersection, reflectionRay, currRecursionDepth-1));
+	
+		Vector tmp = VectorOperations.subtract(invertedRayVector, intersectionPosition);
+		Vector normal = VectorOperations.invert(closestIntersectedObject.getNormal(tmp, intersectionPosition, true));
+
+		Vector reflectionDirection = VectorOperations.scalarMult(2, invertedRayVector);
+		Vector normalMULTcos = VectorOperations.scalarMult(VectorOperations.dotProduct(reflectionDirection, normal), normal);
+		reflectionDirection = VectorOperations.subtract(normalMULTcos, invertedRayVector);
+		reflectionDirection.normalize();
+
+		Point p0 = VectorOperations.add(intersectionPosition, VectorOperations.scalarMult(EPSILON, reflectionDirection));
+		Point p1 = VectorOperations.add(reflectionDirection, p0);
+		Vector rayVector = VectorOperations.add(VectorOperations.normalize(new Vector(p0,p1)), p0);
+
+		Ray reflectionRay = new Ray(p0,rayVector);
 		
+		return VectorOperations.multiply(reflectionColor,getColor(scene, intersection, reflectionRay, currRecursionDepth-1));
 	}
 	
 	private static RGB getOriginalSpecularColor(Scene scene, Light light, Intersection intersection, int currRecursionDepth) {
