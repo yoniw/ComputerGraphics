@@ -161,15 +161,11 @@ public class RayTracer {
 		byte[] rgbData = new byte[this.imageWidth * this.imageHeight * 3];
 
 		
-		//TODO make sure there's no confusion between x and y, width and height etc.
 		RGB[][] RGBMatrix = new RGB[this.imageWidth][this.imageHeight];
 		
-		//TODO fill up the matrix
 		renderScene(RGBMatrix);
 		
-		//TODO delete
-//		printMatrix(RGBMatrix,200,300);
-		
+
 		convertRGBMatrixtoByteArray(rgbData, RGBMatrix);
 		
 		long endTime = System.currentTimeMillis();
@@ -186,42 +182,7 @@ public class RayTracer {
 
 	}
 
-	//TODO delete
-	private void printMatrix(RGB[][] rGBMatrix, int start, int end) {
-		System.out.println("Reds:");
-		for (int i = start; i < end; i++)
-		{
-			for (int j = start; j < end; j++)
-			{
-				System.out.print(rGBMatrix[i][j].getRed() +" | ");
-			}
-			System.out.println();
-		}
-		
-		System.out.println();
-		System.out.println("Greens:");
-		for (int i = start; i < end; i++)
-		{
-			for (int j = start; j < end; j++)
-			{
-				System.out.print(rGBMatrix[i][j].getGreen() +" | ");
-			}
-			System.out.println();
-		}
-		
-		System.out.println();
-		System.out.println("Blues:");
-		for (int i = start; i < end; i++)
-		{
-			for (int j = start; j < end; j++)
-			{
-				System.out.print(rGBMatrix[i][j].getBlue() +" | ");
-			}
-			System.out.println();
-		}
-		
-		
-	}
+	
 
 	private void renderScene(RGB[][] RGBMatrix) {
 		Camera cam = scene.getCamera();
@@ -245,7 +206,6 @@ public class RayTracer {
 
 	}
 
-	//TODO make sure there's no confusion between x and y, width and height etc.
 	private void convertRGBMatrixtoByteArray(byte[] rgbData, RGB[][] RGBMatrix) {
 		
 		for (int x = 0; x < this.imageWidth; x++)
