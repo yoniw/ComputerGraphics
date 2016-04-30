@@ -61,8 +61,7 @@ public class PixelColorProcessor {
 			RGB specularColor = getOriginalSpecularColor(scene, light, intersection, currRecursionDepth);
 			resultColor = VectorOperations.add(specularColor, VectorOperations.add(resultColor, diffuseColor));
 			// shadows
-			resultColor = VectorOperations.scalarMult(shadowsCalc.myGetIntensity(intersection,light,currRecursionDepth), resultColor);
-//			resultColor = VectorOperations.scalarMult(shadowsCalc.getIntensity(intersection,light,currRecursionDepth), resultColor);
+			resultColor = VectorOperations.scalarMult(shadowsCalc.getIntensity(intersection,light,currRecursionDepth), resultColor);
 		}
 		return resultColor;
 		

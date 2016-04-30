@@ -31,7 +31,22 @@ public class Sphere extends Surface{
 		}
 		
 		double t_hc = Math.sqrt((radius * radius) - d2);
-		return t_ca - t_hc;
+
+		double t1 = t_ca - t_hc;
+		double t2 = t_ca + t_hc;
+		
+		if ((t1 <= 0) && (t2 <= 0)) {
+			// Both negative, no intersection.
+			return -1;
+			
+		} else if ((t1 > 0) && (t2 > 0)) { 
+			// Both positive, need the minimal.
+			return Math.min(t1, t2);
+		
+		} else { 
+			// One is positive, this is the one we want.
+			return Math.max(t1, t2);
+		}
 	}
 
 	@Override
