@@ -10,7 +10,6 @@ public class PixelColorProcessor {
 	{
 		Intersection currIntersection = (reflectionRay == null? intersection : reflectionRay.findIntersection(scene));
 		 
-		//System.out.println("current recursion depth: " + currRecursionDepth);	
 		if ((currIntersection == null) || (currIntersection.getIntersections().isEmpty()))
 		{
 			// ray didn't hit any object

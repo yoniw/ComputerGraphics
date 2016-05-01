@@ -38,12 +38,6 @@ public class Intersection {
 	}
 
 
-//	public void removeClosestIntersection() {
-//		intersections.remove(getClosestDistance());
-//		
-//	}
-
-
 	public Surface getNthIntersectedSurface(int currRecursionDepth, int maxRecursionDepth) {
 		int counter = 0;
 		for (Map.Entry<Double, Surface> entry: intersections.entrySet())

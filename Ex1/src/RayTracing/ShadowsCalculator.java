@@ -1,6 +1,5 @@
 package RayTracing;
 
-import java.util.Map.Entry;
 import java.util.Random;
 
 public class ShadowsCalculator {

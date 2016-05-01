@@ -31,7 +31,7 @@ public class RayTracer {
 
 			RayTracer tracer = new RayTracer();
 
-                        // Default values:
+            // Default values:
 			tracer.imageWidth = 500;
 			tracer.imageHeight = 500;
 
@@ -54,8 +54,8 @@ public class RayTracer {
 			// Render scene:
 			tracer.renderScene(outputFileName);
 
-//		} catch (IOException e) {
-//			System.out.println(e.getMessage());
+		} catch (IOException e) {
+			System.out.println(e.getMessage());
 		} catch (RayTracerException e) {
 			System.out.println(e.getMessage());
 		} catch (Exception e) {
