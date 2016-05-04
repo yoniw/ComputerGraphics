@@ -1,5 +1,3 @@
-
-
 M = imread('lena.bmp');
 [m,n] = size(M);
 DX(1:m, 1:n) = 0;
