@@ -15,7 +15,7 @@ end;
 % Computing DY
 for i = 2:m-1
     for j = 2:n-1
-        DY(i,j) = 2*M(i-1,j-1)+M(i-1,j)+M(i-1,j+1)-2*M(i+1,j-1)-M(i+1,j)-2*M(i+1,j+1);
+        DY(i,j) = 2*M(i-1,j-1)+M(i-1,j)+2*M(i-1,j+1)-2*M(i+1,j-1)-M(i+1,j)-2*M(i+1,j+1);
     end
 end
 
