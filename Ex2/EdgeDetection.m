@@ -17,8 +17,8 @@ for i = 2:m-1
 end;
 
 % normalize G
-min = min(G(:));
-max = max(G(:));
-G = (G-min)./(max-min);
+mmin = min(G(:));
+mmax = max(G(:));
+G = (G-mmin)./(mmax-mmin);
 
 imshow(G);
