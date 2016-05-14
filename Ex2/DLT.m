@@ -12,6 +12,11 @@ H = getH(h);
 % denormalize H
 H = inv(T_seoncd)*H*T_first;
 
+% so H' would be in a projective transformation form
+H = H/H(3,3);
+H(1,3) = 0;
+H(2,3) = 0;
+
 end
 
 
