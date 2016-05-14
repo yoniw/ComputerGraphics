@@ -21,5 +21,4 @@ mmin = min(G(:));
 mmax = max(G(:));
 G = (G-mmin)./(mmax-mmin);
 
-
 imshow(G);
