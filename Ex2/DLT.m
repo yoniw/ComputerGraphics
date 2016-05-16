@@ -6,21 +6,21 @@ homMatches = getHomMatrix(matches, n);
 %howMatches is a 6xn matrix
 
 [T_first, T_second] = getTs(homMatches);
-A = assembleA(T_first, T_second, n);
+A = assembleA(T_first, T_second,homMatches, n);
 h = geth_col(A);
 H = getH(h);
 % denormalize H
-H = inv(T_seoncd)*H*T_first;
+H = inv(T_second)*H*T_first;
 
 % so H' would be in a projective transformation form
 H = H/H(3,3);
-H(1,3) = 0;
-H(2,3) = 0;
+%H(1,3) = 0;
+%H(2,3) = 0;
 
 end
 
 
-function [ H ] = getH(h, T_first, T_second)
+function [ H ] = getH(h)
 H = zeros(3,3);
 
 H(:,1) = h(1:3);
@@ -31,27 +31,27 @@ end
 
 
 function [ h ] = geth_col(matrix)
-[U,S,V] = svd(A);
-numVCols = size(A,2);
+[U,S,V] = svd(matrix);
+numVCols = size(V,2);
 h = V(:,numVCols);
 
 end
 
 % creates Ai's 'on live' and puts them into A
-function [ result ] = assembleA(T_first, T_second, n)
+function [ result ] = assembleA(T_first, T_second, hommMatches, n)
 result = zeros(2*n, 9);
 zeros_vector = [0 0 0];
 
 for i =1:n
-   vector_xi = T_first*matches(1:3,i);
-   vector_xi_tag = T_second*matches(4:6,i);
+   vector_xi = T_first*hommMatches(1:3,i);
+   vector_xi_tag = T_second*hommMatches(4:6,i);
    
    xi_tag = vector_xi_tag(1);
    yi_tag = vector_xi_tag(2);
    wi_tag = vector_xi_tag(3);
    
-   result(2*i-1, :) = [zeros_vector' -wi_tag*vector_xi' yi_tag*vector_xi'];
-   result(2*i, :) = [wi_tag*vector_xi' zeros_vector' -xi_tag*vector_xi'];
+   result(2*i-1, :) = [zeros_vector -wi_tag*vector_xi' yi_tag*vector_xi'];
+   result(2*i, :) = [wi_tag*vector_xi' zeros_vector -xi_tag*vector_xi'];
    
 end
 
@@ -63,9 +63,11 @@ Ttranslate_first = getTranslated(mean(homMatches(1:3, :),2));
 Tscale_first = getScaled(Ttranslate_first*homMatches(1:3, :));
 T_first = Tscale_first*Ttranslate_first;
 
+
 Ttranslate_second = getTranslated(mean(homMatches(4:6, :),2));
 Tscale_second = getScaled(Ttranslate_second*homMatches(4:6, :));
-T_second = Ttranslate_second*Tscale_second;
+T_second = Tscale_second*Ttranslate_second;
+
 
 end
 
