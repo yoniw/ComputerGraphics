@@ -1,6 +1,6 @@
 function [ TransformedIm ] = ComputeProjective( im, H )
     
-    TransformedIm = imwarp(im, affine2d(H));
+    TransformedIm = imwarp(im, projective2d(H));
 
 end
 
