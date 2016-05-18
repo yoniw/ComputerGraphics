@@ -1,4 +1,4 @@
-M = imread('lena.bmp');
+M = double(imread('lena.bmp'));
 [m,n] = size(M);
 DX(1:m, 1:n) = 0;
 DY(1:m, 1:n) = 0;
@@ -20,5 +20,6 @@ end;
 mmin = min(G(:));
 mmax = max(G(:));
 G = (G-mmin)./(mmax-mmin);
+
 
 imshow(G);
