@@ -1,5 +1,5 @@
 function [num_matches, matches, dist_vals] = match(image1, image2, distRatio)
-%UNTITLED Summary of this function goes here
+%MATCH Summary of this function goes here
 %   Detailed explanation goes here
 
 	% Find SIFT keypoints for each image

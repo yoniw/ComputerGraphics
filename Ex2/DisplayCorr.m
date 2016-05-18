@@ -9,9 +9,9 @@ function [ displayedCorr ] = DisplayCorr( image1,  image2, matches, dist_vals, x
     im2_cols = size(image2, 2);
     if im1_rows >= im2_rows
         im1 = image1;
-        im2 = cat(1, image2, zeroes(im1_rows - im2_rows), im2_cols);
+        im2 = cat(1, image2, zeros(im1_rows - im2_rows, im2_cols));
     else
-        im1 = cat(1, image1, zeroes(im2_rows - im1_rows), im1_cols);
+        im1 = cat(1, image1, zeros(im2_rows - im1_rows, im1_cols));
         im2 = image2;
     end
     

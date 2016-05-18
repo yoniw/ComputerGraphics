@@ -19,8 +19,8 @@
 function [image, descriptors, locs] = sift(imageFile)
 
 % Load image
-image = imread(imageFile);
-
+% image = imread(imageFile);
+image = imageFile; % Our sift receives a matrix instead of a path.
 % If you have the Image Processing Toolbox, you can uncomment the following
 %   lines to allow input of color images, which will be converted to grayscale.
 % if isrgb(image)
