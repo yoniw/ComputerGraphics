@@ -7,12 +7,12 @@ function [ inliers, M ] = distfn( M, x, t )
     
     inliers = [];
     for i = 1 : cols
-        v_top = x_pad(1:3, i);
-        v_top = M * v_top;
-        v_top_norm = v_top / v_top(3); % 3rd coordinate will be 1.
-        v_bottom = x_pad(4:6, i);
+        v_im1 = x_pad(1:3, i);
+        v_im1 = M * v_im1;
+        v_im1_norm = v_im1 / v_im1(3); % 3rd coordinate will be 1.
+        v_im2 = x_pad(4:6, i);
         
-        distance = v_top_norm - v_bottom;
+        distance = v_im1_norm - v_im2;
         if (norm(distance) < t)
             inliers = [inliers i];
         end
