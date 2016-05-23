@@ -8,4 +8,10 @@ public class Pixel {
 		this.i=i;
 		this.j=j;
 	}
+	
+	// for debugging
+	public String toString()
+	{
+		return "<" + i + ", " + j + ">";  
+	}
 }

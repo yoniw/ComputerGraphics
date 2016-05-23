@@ -8,6 +8,8 @@ public class ColorMatrix {
 	
 	Color[][] matrix;
 	
+
+	
 	public ColorMatrix(BufferedImage currImage) {
 		height = currImage.getHeight();
 		width = currImage.getWidth();

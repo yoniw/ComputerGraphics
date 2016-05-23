@@ -8,12 +8,6 @@ import java.util.List;
 
 import javax.imageio.*;
 
-/*
- * TODO problems:
- *	confusion between x,y indexes..  everywhere :(
- *	missing: increase image size
- */
-
 
 public class Main {
 
@@ -39,17 +33,21 @@ public class Main {
 		
 		ColorMatrix matrixRep = new ColorMatrix(inputImage);
 		
+		int loopNumber = 1;
+		
 		while (matrixRep.getHeight() > numOutputRows || matrixRep.getWidth() > numOutputColumns)
 		{
+			System.out.println("loop number: " + loopNumber++);
+			
+			
 			// step 1
 			int[][] energyValues = computeEnergyMap(matrixRep, energyType);
 		
 			// step 2
 			if (matrixRep.getHeight() > numOutputRows)
 			{
-				// TODO transpose what: energyValues or matrixRep?
+				// TODO transpose energyValues or matrixRep (or both)?
 				matrixRep.matrix = Utils.transpose(matrixRep.matrix);
-				
 			}
 			
 			// step 3
@@ -60,9 +58,35 @@ public class Main {
 			
 			// step 5
 			matrixRep = removeSeam(matrixRep,seam);
-			
 		}
  
+		
+		//TODO delete before submission
+		// draw seam
+//		
+//		// step 1
+//		int[][] energyValues = computeEnergyMap(matrixRep, energyType);
+//	
+//		// step 2
+//		if (matrixRep.getWidth() > numOutputRows)
+//		{
+//			// TODO transpose energyValues or matrixRep (or both)?
+//			matrixRep.matrix = Utils.transpose(matrixRep.matrix);
+//			System.out.println("transposed");
+//		}
+//		
+//		// step 3
+//		int[][] cummulativeEnergy = computeCummulativeMap(energyValues);
+//		
+//		// step 4
+//		List<Pixel> seam = computeLowestEnergySeam(cummulativeEnergy);
+//		
+//		// step 5
+//		matrixRep = drawSeam(matrixRep,seam);
+		
+		
+		// end of draw seam
+		
 		BufferedImage outputImage = convertColorMatrixToBufferedImage(matrixRep);
 		
 		try {
@@ -76,7 +100,7 @@ public class Main {
 
 	private static BufferedImage convertColorMatrixToBufferedImage(ColorMatrix matrixRep) {
 		BufferedImage bufferedImage = new BufferedImage(matrixRep.getWidth(), matrixRep.getHeight(), BufferedImage.TYPE_INT_RGB);
-
+				
 		for (int i = 0; i < matrixRep.matrix.length; i++)
 		{
 			for (int j = 0; j < matrixRep.matrix[0].length; j++)
@@ -87,19 +111,37 @@ public class Main {
 		return bufferedImage;
 	}
 
+	// TODO delete before submission
+	private static ColorMatrix drawSeam(ColorMatrix matrixRep, List<Pixel> seam) {
+		ColorMatrix result = matrixRep;
+		for (int i = 0; i < result.matrix.length; i++)
+		{
+			int j = getSeamJIndex(seam,i);
+			for (int jj = 0; jj < matrixRep.matrix[0].length; jj++)
+			{
+				if (j == jj)
+				{
+					// paint seam in white
+					result.matrix[i][jj] = new Color(255,255,255);
+				}
+			}
+		}
+		return result;
+	}
+	
+	
 	private static ColorMatrix removeSeam(ColorMatrix matrixRep, List<Pixel> seam) {
 		ColorMatrix result = new ColorMatrix(matrixRep.getHeight(), matrixRep.getWidth()-1);
-		
-		for (int i = 0; i < result.getHeight(); i++)
+		for (int i = 0; i < result.matrix[0].length; i++)
 		{
 			int j = getSeamJIndex(seam,i);
 			for (int jj = 0; jj < j; jj++)
 			{
-				result.matrix[i][jj] = matrixRep.getRGB(i, jj);
+				result.matrix[jj][i] = matrixRep.getRGB(jj, i);
 			}
-			for (int jj = j+1; jj < result.getWidth(); jj++)
+			for (int jj = j+1; jj < matrixRep.matrix.length; jj++)
 			{
-				result.matrix[i][jj-1] = matrixRep.getRGB(i, jj);
+				result.matrix[jj-1][i] = matrixRep.getRGB(jj, i);
 			}
 		}
 		
@@ -121,33 +163,32 @@ public class Main {
 	private static List<Pixel> computeLowestEnergySeam(int[][] cummulativeEnergy) {
 		List<Pixel> seam = new LinkedList<>();
 		
-		int currRow = cummulativeEnergy.length;
+		int currRow = cummulativeEnergy.length-1;
 		Pixel currPixel = getMinBottomPixel(cummulativeEnergy);
 		seam.add(currPixel);
-		while (currRow >= 0)
+		while (currRow > 0)
 		{
 			int leftNeighborValue = Integer.MAX_VALUE;
 			int rightNeighborValue = Integer.MAX_VALUE;
 			//left neighbor
-			if (currPixel.i > 0 && currPixel.i <= cummulativeEnergy[0].length-1)
+			if (currPixel.j > 0 && currPixel.j <= cummulativeEnergy[0].length-1)
 			{
-
-				leftNeighborValue = cummulativeEnergy[currPixel.i-1][currRow-1];
+				leftNeighborValue = cummulativeEnergy[currRow-1][currPixel.j-1];
 			}
 			
 			//right neighbor
-			if (currPixel.i >= 0 && currPixel.i < cummulativeEnergy[0].length-1)
+			if (currPixel.j >= 0 && currPixel.j < cummulativeEnergy[0].length-1)
 			{
-				rightNeighborValue = cummulativeEnergy[currPixel.i+1][currRow-1];
+				rightNeighborValue = cummulativeEnergy[currRow-1][currPixel.j+1];
 			}
 			
 			if (leftNeighborValue < rightNeighborValue)
 			{
-				currPixel = new Pixel(currPixel.i-1,currRow-1);
+				currPixel = new Pixel(currRow-1,currPixel.j-1);
 			}
 			else
 			{
-				currPixel = new Pixel(currPixel.i+1,currRow-1);
+				currPixel = new Pixel(currRow-1, currPixel.j+1);
 			}
 			
 			seam.add(currPixel);
@@ -158,14 +199,14 @@ public class Main {
 	}
 
 	private static Pixel getMinBottomPixel(int[][] cummulativeEnergy) {
-		Pixel minBottomPixel = new Pixel(-1, cummulativeEnergy[0].length-1);
+		Pixel minBottomPixel = new Pixel(cummulativeEnergy.length-1, -1);
 		int min = Integer.MAX_VALUE;
-		for (int i = 0; i < cummulativeEnergy.length; i++)
+		for (int j = 0; j < cummulativeEnergy[0].length; j++)
 		{
-			if (cummulativeEnergy[i][cummulativeEnergy[0].length-1] < min)
+			if (cummulativeEnergy[cummulativeEnergy.length-1][j] < min)
 			{
-				min = cummulativeEnergy[i][cummulativeEnergy[0].length-1];
-				minBottomPixel.i = i;
+				min = cummulativeEnergy[cummulativeEnergy.length-1][j] ;
+				minBottomPixel.j = j;
 			}
 		}
 		return minBottomPixel;
@@ -177,7 +218,6 @@ public class Main {
 		{
 			for (int j = 0; j < dynamicProgrammingCache[0].length; j++)
 			{
-				System.out.println("i: " + i + " j:" + j);
 				dynamicProgrammingCache[i][j] = getM(energyValues,i,j);
 			}
 		}
@@ -246,6 +286,10 @@ public class Main {
 				sum += getGrayscaleValue(matrixRep,i,j);
 			}
 		}
+		if (sum == 0)
+		{
+			return fmn;
+		}
 		return fmn/sum;
 	}
 
@@ -293,12 +337,13 @@ public class Main {
 
 	private static int getValue(ColorMatrix matrixRep, int i, int j, Color inputPixel)
 	{
-		if (i < 0 || j < 0 || i >= matrixRep.getWidth() || j >= matrixRep.getHeight())
+		if (i < 0 || j < 0 || i >= matrixRep.matrix.length || j >= matrixRep.matrix[0].length)
 		{
 			return -1;
 		}
+
 		Color currPixel = matrixRep.getRGB(i, j);
-		
+
 		return Math.abs(inputPixel.getRed()-currPixel.getRed()) + Math.abs(inputPixel.getGreen()-currPixel.getGreen()) + Math.abs(inputPixel.getBlue()-currPixel.getBlue());
 	}
 	
