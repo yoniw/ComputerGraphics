@@ -256,6 +256,7 @@ public class Main {
 				if (energyType == 1)
 				{
 					energyValues[i][j] += getEntropyValue(matrixRep,i,j);
+					//TODO should we take the average instead?
 				}
 			}
 		}
@@ -270,7 +271,7 @@ public class Main {
 			for (int m = j-4; m < j+4; m++)
 			{
 				int pm = getPmn(matrixRep,i,j);
-				sum += pm * log2(pm); //TODO base 2 indeed?
+				sum += pm * Math.log(pm); 
 			}
 		}
 		return -1*sum;
@@ -298,9 +299,7 @@ public class Main {
 		return (color.getRed()+color.getGreen()+color.getBlue())/3;
 	}
 
-	private static double log2(int n) {
-		return Math.log(n)/Math.log(2);
-	}
+
 
 	private static int computePixelGradient(ColorMatrix matrixRep, int i, int j) {
 		int energy = 0;
