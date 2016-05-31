@@ -48,6 +48,11 @@ public class Main {
 			{
 				// TODO transpose energyValues or matrixRep (or both)?
 				matrixRep.matrix = Utils.transpose(matrixRep.matrix);
+				int height = matrixRep.getHeight();
+				int width = matrixRep.getWidth();
+				matrixRep.setHeight(width);
+				matrixRep.setWidth(height);
+				energyValues = Utils.transpose(energyValues);
 			}
 			
 			// step 3
@@ -131,17 +136,17 @@ public class Main {
 	
 	
 	private static ColorMatrix removeSeam(ColorMatrix matrixRep, List<Pixel> seam) {
-		ColorMatrix result = new ColorMatrix(matrixRep.getHeight(), matrixRep.getWidth()-1);
-		for (int i = 0; i < result.matrix[0].length; i++)
+		ColorMatrix result = new ColorMatrix(matrixRep.getHeight()-1, matrixRep.getWidth());
+		for (int i = 0; i < result.matrix.length; i++)
 		{
 			int j = getSeamJIndex(seam,i);
 			for (int jj = 0; jj < j; jj++)
 			{
-				result.matrix[jj][i] = matrixRep.getRGB(jj, i);
+				result.matrix[i][jj] = matrixRep.getRGB(i, jj);
 			}
-			for (int jj = j+1; jj < matrixRep.matrix.length; jj++)
+			for (int jj = j+1; jj < matrixRep.matrix[0].length; jj++)
 			{
-				result.matrix[jj-1][i] = matrixRep.getRGB(jj, i);
+				result.matrix[i][jj-1] = matrixRep.getRGB(i, jj);
 			}
 		}
 		
@@ -302,50 +307,34 @@ public class Main {
 
 
 	private static int computePixelGradient(ColorMatrix matrixRep, int i, int j) {
-		int energy = 0;
-		int numNeighbours = 0;
-		List<Integer> neighboursValues = getNeighboursValues(matrixRep,i,j);
-		for (int neighbourValue : neighboursValues)
-		{
-			if (neighbourValue != -1)
-			{
-				energy += neighbourValue;
-				numNeighbours++;
-			}
 
-		}
-		return energy/numNeighbours;
-	}
-
-	
-	private static List<Integer> getNeighboursValues(ColorMatrix matrixRep, int i, int j) {
 		Color inputPixel = matrixRep.getRGB(i, j);
-		List<Integer> neighboursValues = new ArrayList<>();
+
+		int neighboursCount = 0;
+		int sumEnergy = 0;
 		
-		neighboursValues.add(getValue(matrixRep,i-1,j-1,inputPixel));
-		neighboursValues.add(getValue(matrixRep,i-1,j,inputPixel));
-		neighboursValues.add(getValue(matrixRep,i-1,j+1,inputPixel));
-		neighboursValues.add(getValue(matrixRep,i,j+1,inputPixel));
-		neighboursValues.add(getValue(matrixRep,i+1,j+1,inputPixel));
-		neighboursValues.add(getValue(matrixRep,i+1,j,inputPixel));
-		neighboursValues.add(getValue(matrixRep,i+1,j-1,inputPixel));
-		neighboursValues.add(getValue(matrixRep,i,j-1,inputPixel));
-
-		return neighboursValues;
-	}
-
-	private static int getValue(ColorMatrix matrixRep, int i, int j, Color inputPixel)
-	{
-		if (i < 0 || j < 0 || i >= matrixRep.matrix.length || j >= matrixRep.matrix[0].length)
-		{
-			return -1;
+		for (int x = -1; x <= 1; x++) {
+			for (int y = -1; y <= 1; y++) {
+				
+				int curr_i = i + x;
+				int curr_j = j + y;
+				
+				if ((curr_i >= 0) && (curr_j >= 0) 
+						&& (curr_i < matrixRep.matrix.length) 
+						&& (curr_j < matrixRep.matrix[0].length)) {
+					
+					// Neighbour inside matrix. Calculating value.
+					neighboursCount++;
+					Color currPixel = matrixRep.getRGB(curr_i, curr_j);
+					sumEnergy += Math.abs(inputPixel.getRed() - currPixel.getRed()) 
+							+ Math.abs(inputPixel.getGreen() - currPixel.getGreen()) 
+							+ Math.abs(inputPixel.getBlue() - currPixel.getBlue());
+				}
+			}
 		}
-
-		Color currPixel = matrixRep.getRGB(i, j);
-
-		return Math.abs(inputPixel.getRed()-currPixel.getRed()) + Math.abs(inputPixel.getGreen()-currPixel.getGreen()) + Math.abs(inputPixel.getBlue()-currPixel.getBlue());
+		
+		
+		return sumEnergy / neighboursCount;
 	}
-	
-	
 
 }
