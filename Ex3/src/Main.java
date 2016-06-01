@@ -37,14 +37,15 @@ public class Main {
 		
 		while (matrixRep.getHeight() > numOutputRows || matrixRep.getWidth() > numOutputColumns)
 		{
-			System.out.println("loop number: " + loopNumber++);
+			System.out.println("loop number: " + loopNumber++ + " height: " + matrixRep.getHeight() + " width: " + matrixRep.getWidth());
 			
 			
 			// step 1
 			int[][] energyValues = computeEnergyMap(matrixRep, energyType);
 		
 			// step 2
-			if (matrixRep.getHeight() > numOutputRows)
+			boolean transposed = false;
+			if (matrixRep.getWidth() > numOutputColumns)
 			{
 				// TODO transpose energyValues or matrixRep (or both)?
 				matrixRep.matrix = Utils.transpose(matrixRep.matrix);
@@ -53,6 +54,7 @@ public class Main {
 				matrixRep.setHeight(width);
 				matrixRep.setWidth(height);
 				energyValues = Utils.transpose(energyValues);
+				transposed = true;
 			}
 			
 			// step 3
@@ -63,6 +65,15 @@ public class Main {
 			
 			// step 5
 			matrixRep = removeSeam(matrixRep,seam);
+			
+			// Transpose back.
+			if (transposed) {
+				matrixRep.matrix = Utils.transpose(matrixRep.matrix);
+				int height = matrixRep.getHeight();
+				int width = matrixRep.getWidth();
+				matrixRep.setHeight(width);
+				matrixRep.setWidth(height);
+			}
 		}
  
 		
