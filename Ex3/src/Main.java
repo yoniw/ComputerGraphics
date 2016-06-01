@@ -5,6 +5,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 
 import javax.imageio.*;
 
@@ -12,7 +14,9 @@ import javax.imageio.*;
 public class Main {
 
 	// holds M values 
-	private static int[][] dynamicProgrammingCache;
+	private static int[][] MValuesCache;
+	// holds Pmn values
+	private static int[][] PmnValuesCache;
 	
 	public static void main(String[] args)
 	{
@@ -184,29 +188,28 @@ public class Main {
 		seam.add(currPixel);
 		while (currRow > 0)
 		{
-			int leftNeighborValue = Integer.MAX_VALUE;
-			int rightNeighborValue = Integer.MAX_VALUE;
-			//left neighbor
+			TreeMap<Integer,Pixel> neighborsValueToPixelMap = new TreeMap<>();
+
+			// left upper neighbor
 			if (currPixel.j > 0 && currPixel.j <= cummulativeEnergy[0].length-1)
 			{
-				leftNeighborValue = cummulativeEnergy[currRow-1][currPixel.j-1];
+				int leftNeighborValue = cummulativeEnergy[currRow-1][currPixel.j-1];
+				neighborsValueToPixelMap.put(leftNeighborValue, new Pixel(currRow-1,currPixel.j-1));
 			}
 			
-			//right neighbor
+			// right upper neighbor
 			if (currPixel.j >= 0 && currPixel.j < cummulativeEnergy[0].length-1)
 			{
-				rightNeighborValue = cummulativeEnergy[currRow-1][currPixel.j+1];
+				int rightNeighborValue = cummulativeEnergy[currRow-1][currPixel.j+1];
+				neighborsValueToPixelMap.put(rightNeighborValue, new Pixel(currRow-1, currPixel.j+1));
 			}
 			
-			if (leftNeighborValue < rightNeighborValue)
-			{
-				currPixel = new Pixel(currRow-1,currPixel.j-1);
-			}
-			else
-			{
-				currPixel = new Pixel(currRow-1, currPixel.j+1);
-			}
+			// upper neighbor
+			int upperNeighborValue = cummulativeEnergy[currRow-1][currPixel.j];
+			neighborsValueToPixelMap.put(upperNeighborValue, new Pixel(currRow-1, currPixel.j));
 			
+			// minimum value
+			currPixel = neighborsValueToPixelMap.firstEntry().getValue();
 			seam.add(currPixel);
 			currRow--;
 		}
@@ -229,15 +232,15 @@ public class Main {
 	}
 
 	private static int[][] computeCummulativeMap(int[][] energyValues) {
-		dynamicProgrammingCache = new int[energyValues.length][energyValues[0].length];
-		for (int i = 1; i < dynamicProgrammingCache.length; i++)
+		MValuesCache = new int[energyValues.length][energyValues[0].length];
+		for (int i = 1; i < MValuesCache.length; i++)
 		{
-			for (int j = 0; j < dynamicProgrammingCache[0].length; j++)
+			for (int j = 0; j < MValuesCache[0].length; j++)
 			{
-				dynamicProgrammingCache[i][j] = getM(energyValues,i,j);
+				MValuesCache[i][j] = getM(energyValues,i,j);
 			}
 		}
-		return dynamicProgrammingCache;
+		return MValuesCache;
 	}
 
 	private static int getM(int[][] energyValues, int i, int j) {
@@ -251,28 +254,34 @@ public class Main {
 			return energyValues[i][j];
 		}
 		
-		if(dynamicProgrammingCache[i][j] != 0)
+		if(MValuesCache[i][j] != 0)
 		{
-			return dynamicProgrammingCache[i][j];
+			return MValuesCache[i][j];
 		}
-		dynamicProgrammingCache[i][j] = energyValues[i][j] + Math.min(Math.min(getM(energyValues,i-1,j-1), getM(energyValues,i-1,j)),  getM(energyValues,i-1,j+1));
-		return dynamicProgrammingCache[i][j];
+		MValuesCache[i][j] = energyValues[i][j] + Math.min(Math.min(getM(energyValues,i-1,j-1), getM(energyValues,i-1,j)),  getM(energyValues,i-1,j+1));
+		return MValuesCache[i][j];
 	}
 
 	private static int[][] computeEnergyMap(ColorMatrix matrixRep, int energyType) {
 		
 		int[][] energyValues = new int[matrixRep.matrix.length][matrixRep.matrix[0].length];
+		if (energyType == 1)
+		{
+			PmnValuesCache = new int[matrixRep.matrix.length][matrixRep.matrix[0].length];
+		}
 		
 		for (int i = 0; i < energyValues.length; i++)
 		{
 			for (int j = 0; j < energyValues[0].length; j++)
 			{
 				int pixelGradient = computePixelGradient(matrixRep,i,j);
-				energyValues[i][j] = pixelGradient;
-				if (energyType == 1)
+				if (energyType == 0)
 				{
-					energyValues[i][j] += getEntropyValue(matrixRep,i,j);
-					//TODO should we take the average instead?
+					energyValues[i][j] = pixelGradient;
+				}
+				else if (energyType == 1)
+				{
+					energyValues[i][j] = (pixelGradient + getEntropyValue(matrixRep,i,j))/2;
 				}
 			}
 		}
@@ -294,6 +303,11 @@ public class Main {
 	}
 
 	private static int getPmn(ColorMatrix matrixRep, int i, int j) {
+		if (PmnValuesCache[i][j] != 0)
+		{
+			return PmnValuesCache[i][j];
+		}
+		
 		int fmn = getGrayscaleValue(matrixRep,i,j);
 		int sum = 0;
 		for (int l = i-4; l < i+4; l++)
@@ -307,6 +321,7 @@ public class Main {
 		{
 			return fmn;
 		}
+		PmnValuesCache[i][j] = fmn/sum;
 		return fmn/sum;
 	}
 
