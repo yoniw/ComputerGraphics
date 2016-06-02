@@ -38,18 +38,24 @@ public class Main {
 		ColorMatrix matrixRep = new ColorMatrix(inputImage);
 		
 		int loopNumber = 1;
+		boolean enlarge = false;
 		
-		while (matrixRep.getHeight() > numOutputRows || matrixRep.getWidth() > numOutputColumns)
+		if (matrixRep.getHeight() < numOutputRows || matrixRep.getWidth() < numOutputColumns)
+		{
+			enlarge = true;
+		}
+		int[][] cummulativeEnergy = null;
+		
+		while (matrixRep.getHeight() != numOutputRows || matrixRep.getWidth() != numOutputColumns)
 		{
 			System.out.println("loop number: " + loopNumber++ + " height: " + matrixRep.getHeight() + " width: " + matrixRep.getWidth());
-			
 			
 			// step 1
 			int[][] energyValues = computeEnergyMap(matrixRep, energyType);
 		
 			// step 2
 			boolean transposed = false;
-			if (matrixRep.getWidth() > numOutputColumns)
+			if (matrixRep.getWidth() != numOutputColumns)
 			{
 				// TODO transpose energyValues or matrixRep (or both)?
 				matrixRep.matrix = Utils.transpose(matrixRep.matrix);
@@ -62,13 +68,28 @@ public class Main {
 			}
 			
 			// step 3
-			int[][] cummulativeEnergy = computeCummulativeMap(energyValues);
+			cummulativeEnergy = computeCummulativeMap(cummulativeEnergy,energyValues);
 			
 			// step 4
-			List<Pixel> seam = computeLowestEnergySeam(cummulativeEnergy);
+			List<Pixel> seam;
+			seam = computeLowestEnergySeam(cummulativeEnergy);
+			if (enlarge)
+			{
+				// makes sure we won't choose the same seam over and over again
+				cummulativeEnergy = boostEnergy(cummulativeEnergy, seam);
+				seam = computeLowestEnergySeam(cummulativeEnergy);
+			}
 			
 			// step 5
-			matrixRep = removeSeam(matrixRep,seam);
+			if (enlarge)
+			{
+				matrixRep = addSeam(matrixRep,seam);
+			}
+			else
+			{
+				matrixRep = removeSeam(matrixRep,seam);
+			}
+			
 			
 			// Transpose back.
 			if (transposed) {
@@ -116,6 +137,39 @@ public class Main {
 			e.printStackTrace();
 		}
 		
+	}
+
+	private static int[][] boostEnergy(int[][] cummulativeEnergy, List<Pixel> seam) {
+		int[][] result = cummulativeEnergy;
+		
+		for (Pixel p : seam)
+		{
+
+			result[p.i][p.j] = Integer.MAX_VALUE;
+		}
+		
+		return result;
+	}
+
+	private static ColorMatrix addSeam(ColorMatrix matrixRep, List<Pixel> seam) {
+		ColorMatrix result = new ColorMatrix(matrixRep.getHeight()+1, matrixRep.getWidth());
+		for (int i = 0; i< result.matrix.length; i++)
+		{
+			int j = getSeamJIndex(seam,i);
+			for (int jj = 0; jj <= j; jj++)
+			{
+				result.matrix[i][jj] = matrixRep.getRGB(i, jj);
+			}
+			// duplicate the seam
+			result.matrix[i][j+1] = matrixRep.getRGB(i, j);
+			
+			for (int jj = j+2; jj < result.matrix[0].length; jj++)
+			{
+				result.matrix[i][jj] = matrixRep.getRGB(i, jj-1);
+			}
+		}
+		
+		return result;
 	}
 
 	private static BufferedImage convertColorMatrixToBufferedImage(ColorMatrix matrixRep) {
@@ -231,17 +285,44 @@ public class Main {
 		return minBottomPixel;
 	}
 
-	private static int[][] computeCummulativeMap(int[][] energyValues) {
-		MValuesCache = new int[energyValues.length][energyValues[0].length];
-		for (int i = 1; i < MValuesCache.length; i++)
+	private static int[][] computeCummulativeMap(int[][] cummulativeEnergy, int[][] energyValues) {
+		
+		if (cummulativeEnergy == null)
 		{
-			for (int j = 0; j < MValuesCache[0].length; j++)
+			MValuesCache = new int[energyValues.length][energyValues[0].length];
+			for (int i = 1; i < MValuesCache.length; i++)
 			{
-				MValuesCache[i][j] = getM(energyValues,i,j);
+				for (int j = 0; j < MValuesCache[0].length; j++)
+				{
+					MValuesCache[i][j] = getM(energyValues,i,j);
+				}
 			}
+			return MValuesCache;
 		}
-		return MValuesCache;
+
+		else
+		{
+			int[][] backup = MValuesCache;
+			MValuesCache = new int[energyValues.length][energyValues[0].length];
+			for (int i = 1; i < MValuesCache.length; i++)
+			{
+				for (int j = 0; j < MValuesCache[0].length; j++)
+				{
+					if (i >= backup.length || j >= backup[0].length)
+					{
+						MValuesCache[i][j] = getM(energyValues,i,j);
+					}
+					else
+					{
+						// no need to compute again
+						MValuesCache[i][j] = backup[i][j]; 
+					}
+				}
+			}
+			return MValuesCache;
+		}
 	}
+	
 
 	private static int getM(int[][] energyValues, int i, int j) {
 		
