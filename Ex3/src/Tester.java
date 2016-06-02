@@ -5,6 +5,7 @@ public class Tester {
 	{
 		// originalcastle.jpg dimensions: 1428 968
 		
+		
 		// energyType == 0
 		
 		// reducing width
@@ -26,6 +27,7 @@ public class Tester {
 		
 	
 		// energyType == 1
+		
 		// reducing width
 		Main.main(new String[]{"originalcastle.jpg", "1000", "968", "1", "1000_968_1.jpg"});
 		// reducing height
@@ -44,6 +46,7 @@ public class Tester {
 		Main.main(new String[]{"originalcastle.jpg", "1000", "1050", "1", "1000_1050_1.jpg"});
 		
 		// energyType == 2
+		
 		// TODO
 	}
 }
