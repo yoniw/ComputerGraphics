@@ -97,6 +97,14 @@ public class Main {
 			if (enlarge && numColsLeft == 0)
 			{
 				// it's time to add the removed seams.
+				
+				//transpose copyOf
+				copyOfMatrixRep.matrix = Utils.transpose(copyOfMatrixRep.matrix);
+				int copyOfMatrixRepHeight = copyOfMatrixRep.getHeight();
+				int copyOfMatrixRepWidth = copyOfMatrixRep.getWidth();
+				copyOfMatrixRep.setHeight(copyOfMatrixRepWidth);
+				copyOfMatrixRep.setWidth(copyOfMatrixRepHeight);
+							
 				matrixRep = addSeams(copyOfMatrixRep,seamsRemoved);
 				// later, when we add rows, the "original image" will be matrixRep 
 				copyOfMatrixRep = matrixRep;
@@ -107,29 +115,17 @@ public class Main {
 			// Transpose back.
 			if (transposed) {
 				matrixRep.matrix = Utils.transpose(matrixRep.matrix);
-				copyOfMatrixRep.matrix = Utils.transpose(copyOfMatrixRep.matrix);
 				matrixRep.setPixelsMatrix(Utils.transpose(matrixRep.getPixelsMatrix()));
 				int height = matrixRep.getHeight();
 				int width = matrixRep.getWidth();
 				matrixRep.setHeight(width);
 				matrixRep.setWidth(height);
-				int copyOfMatrixRepHeight = copyOfMatrixRep.getHeight();
-				int copyOfMatrixRepWidth = copyOfMatrixRep.getWidth();
-				copyOfMatrixRep.setHeight(copyOfMatrixRepWidth);
-				copyOfMatrixRep.setWidth(copyOfMatrixRepHeight);
 			}
 			
 		}
 	
 		if (enlarge && numRowsLeft == 0)
-		{
-			// transpose copyOf 
-			copyOfMatrixRep.matrix = Utils.transpose(copyOfMatrixRep.matrix);
-			int copyOfMatrixRepHeight = copyOfMatrixRep.getHeight();
-			int copyOfMatrixRepWidth = copyOfMatrixRep.getWidth();
-			copyOfMatrixRep.setHeight(copyOfMatrixRepWidth);
-			copyOfMatrixRep.setWidth(copyOfMatrixRepHeight);
-			
+		{		
 			matrixRep = addSeams(copyOfMatrixRep,seamsRemoved);
 		}
 		
