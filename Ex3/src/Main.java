@@ -2,10 +2,9 @@ import java.awt.Color;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.TreeMap;
 
 import javax.imageio.*;
@@ -18,6 +17,7 @@ public class Main {
 	// holds Pmn values
 	private static int[][] PmnValuesCache;
 	
+
 	public static void main(String[] args)
 	{
 		String inputImagePath = args[0];
@@ -32,101 +32,107 @@ public class Main {
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		}
-		
+		}	
 		
 		ColorMatrix matrixRep = new ColorMatrix(inputImage);
+		ColorMatrix copyOfMatrixRep = new ColorMatrix(inputImage);
 		
 		int loopNumber = 1;
 		boolean enlarge = false;
+		List<List<Pixel>> seamsRemoved = new LinkedList<>();
 		
-		if (matrixRep.getHeight() < numOutputRows || matrixRep.getWidth() < numOutputColumns)
-		{
-			enlarge = true;
-		}
-		int[][] cummulativeEnergy = null;
+		int numRowsLeft, numColsLeft;
+		numRowsLeft = Math.abs(matrixRep.getHeight() - numOutputRows);
+		numColsLeft = Math.abs(matrixRep.getWidth() - numOutputColumns);
 		
-		while (matrixRep.getHeight() != numOutputRows || matrixRep.getWidth() != numOutputColumns)
+		while (numRowsLeft > 0 || numColsLeft > 0)
 		{
 			System.out.println("loop number: " + loopNumber++ + " height: " + matrixRep.getHeight() + " width: " + matrixRep.getWidth());
+			
+			enlarge = false;
+			if (numColsLeft > 0 && matrixRep.getWidth() < numOutputColumns)
+			{
+				enlarge = true;
+			}
+			else if (numColsLeft == 0 && matrixRep.getHeight() < numOutputRows)
+			{
+				enlarge = true;
+			}
 			
 			// step 1
 			int[][] energyValues = computeEnergyMap(matrixRep, energyType);
 		
 			// step 2
 			boolean transposed = false;
-			if (matrixRep.getWidth() != numOutputColumns)
+			if (numColsLeft > 0)
 			{
-				// TODO transpose energyValues or matrixRep (or both)?
 				matrixRep.matrix = Utils.transpose(matrixRep.matrix);
+				matrixRep.setPixelsMatrix(Utils.transpose(matrixRep.getPixelsMatrix()));
 				int height = matrixRep.getHeight();
 				int width = matrixRep.getWidth();
 				matrixRep.setHeight(width);
 				matrixRep.setWidth(height);
 				energyValues = Utils.transpose(energyValues);
 				transposed = true;
-			}
-			
-			// step 3
-			cummulativeEnergy = computeCummulativeMap(cummulativeEnergy,energyValues);
-			
-			// step 4
-			List<Pixel> seam;
-			seam = computeLowestEnergySeam(cummulativeEnergy);
-			if (enlarge)
-			{
-				// makes sure we won't choose the same seam over and over again
-				cummulativeEnergy = boostEnergy(cummulativeEnergy, seam);
-				seam = computeLowestEnergySeam(cummulativeEnergy);
-			}
-			
-			// step 5
-			if (enlarge)
-			{
-				matrixRep = addSeam(matrixRep,seam);
+				numColsLeft--; 
 			}
 			else
 			{
-				matrixRep = removeSeam(matrixRep,seam);
+				numRowsLeft--;
 			}
 			
+			// step 3
+			int[][] cummulativeEnergy = computeCummulativeMap(energyValues);
+			
+			// step 4
+			List<Pixel> seam = computeLowestEnergySeam(cummulativeEnergy, matrixRep);
+			if (enlarge)
+			{
+				seamsRemoved.add(seam);
+			}
+			
+			// step 5
+			matrixRep = removeSeam(matrixRep,seam);
+
+			if (enlarge && numColsLeft == 0)
+			{
+				// it's time to add the removed seams.
+				matrixRep = addSeams(copyOfMatrixRep,seamsRemoved);
+				// later, when we add rows, the "original image" will be matrixRep 
+				copyOfMatrixRep = matrixRep;
+				// clean seams list
+				seamsRemoved = new LinkedList<>();
+			}
 			
 			// Transpose back.
 			if (transposed) {
 				matrixRep.matrix = Utils.transpose(matrixRep.matrix);
+				copyOfMatrixRep.matrix = Utils.transpose(copyOfMatrixRep.matrix);
+				matrixRep.setPixelsMatrix(Utils.transpose(matrixRep.getPixelsMatrix()));
 				int height = matrixRep.getHeight();
 				int width = matrixRep.getWidth();
 				matrixRep.setHeight(width);
 				matrixRep.setWidth(height);
+				int copyOfMatrixRepHeight = copyOfMatrixRep.getHeight();
+				int copyOfMatrixRepWidth = copyOfMatrixRep.getWidth();
+				copyOfMatrixRep.setHeight(copyOfMatrixRepWidth);
+				copyOfMatrixRep.setWidth(copyOfMatrixRepHeight);
 			}
+			
 		}
- 
+	
+		if (enlarge && numRowsLeft == 0)
+		{
+			// transpose copyOf 
+			copyOfMatrixRep.matrix = Utils.transpose(copyOfMatrixRep.matrix);
+			int copyOfMatrixRepHeight = copyOfMatrixRep.getHeight();
+			int copyOfMatrixRepWidth = copyOfMatrixRep.getWidth();
+			copyOfMatrixRep.setHeight(copyOfMatrixRepWidth);
+			copyOfMatrixRep.setWidth(copyOfMatrixRepHeight);
+			
+			matrixRep = addSeams(copyOfMatrixRep,seamsRemoved);
+		}
 		
-		//TODO delete before submission
-		// draw seam
-//		
-//		// step 1
-//		int[][] energyValues = computeEnergyMap(matrixRep, energyType);
-//	
-//		// step 2
-//		if (matrixRep.getWidth() > numOutputRows)
-//		{
-//			// TODO transpose energyValues or matrixRep (or both)?
-//			matrixRep.matrix = Utils.transpose(matrixRep.matrix);
-//			System.out.println("transposed");
-//		}
-//		
-//		// step 3
-//		int[][] cummulativeEnergy = computeCummulativeMap(energyValues);
-//		
-//		// step 4
-//		List<Pixel> seam = computeLowestEnergySeam(cummulativeEnergy);
-//		
-//		// step 5
-//		matrixRep = drawSeam(matrixRep,seam);
-		
-		
-		// end of draw seam
 		
 		BufferedImage outputImage = convertColorMatrixToBufferedImage(matrixRep);
 		
@@ -139,38 +145,74 @@ public class Main {
 		
 	}
 
-	private static int[][] boostEnergy(int[][] cummulativeEnergy, List<Pixel> seam) {
-		int[][] result = cummulativeEnergy;
-		
-		for (Pixel p : seam)
-		{
 
-			result[p.i][p.j] = Integer.MAX_VALUE;
-		}
+	private static ColorMatrix addSeams(ColorMatrix copyOf, List<List<Pixel>> seamsRemoved) {
+		int numSeams = seamsRemoved.size();
+		ColorMatrix enlargedColorMatrix = new ColorMatrix(copyOf.getHeight() + numSeams, copyOf.getWidth());
 		
-		return result;
+		// maps a row to (sorted) j-indexes of pixels we have to duplicate
+		TreeMap<Integer,List<Integer>> pixelsToDuplicateInEachRow = prepareRowToPixelsMap(copyOf, seamsRemoved);
+		
+		Pixel[][] enlargedPixelMatrix = enlargedColorMatrix.getPixelsMatrix();
+		
+		// fill enlarged matrix
+		for (int i = 0; i < enlargedColorMatrix.getWidth(); i++)
+		{
+			List<Integer> currRowPixelsToDuplicate = pixelsToDuplicateInEachRow.get(i);
+			int numPixelsDuplicatedCurrRow = 0;
+			for (int j = 0; j < enlargedColorMatrix.getHeight(); j++)
+			{
+				// get a 'regular' pixel
+				enlargedColorMatrix.matrix[i][j] = copyOf.matrix[i][j-numPixelsDuplicatedCurrRow];
+				Pixel p = new Pixel(i, j-numPixelsDuplicatedCurrRow);
+				p.setOriginal_i(p.i);
+				p.setOriginal_j(p.j);
+				enlargedPixelMatrix[i][j] = p;
+				
+				if (currRowPixelsToDuplicate.contains(j-numPixelsDuplicatedCurrRow))
+				{
+					// we have to duplicate this pixel to the right					
+					enlargedColorMatrix.matrix[i][j+1] = copyOf.matrix[i][j-numPixelsDuplicatedCurrRow];
+					p = new Pixel(i, j-numPixelsDuplicatedCurrRow+1);
+					p.setOriginal_i(p.i);
+					p.setOriginal_j(p.j);
+					enlargedPixelMatrix[i][j+1] = p;
+					
+					numPixelsDuplicatedCurrRow++;
+					j++;
+				}
+			}
+		}
+		enlargedColorMatrix.setPixelsMatrix(enlargedPixelMatrix);
+		
+		return enlargedColorMatrix;
 	}
 
-	private static ColorMatrix addSeam(ColorMatrix matrixRep, List<Pixel> seam) {
-		ColorMatrix result = new ColorMatrix(matrixRep.getHeight()+1, matrixRep.getWidth());
-		for (int i = 0; i< result.matrix.length; i++)
+
+	
+	private static TreeMap<Integer, List<Integer>> prepareRowToPixelsMap(ColorMatrix copyOf,List<List<Pixel>> seamsRemoved) {
+		TreeMap<Integer,List<Integer>> pixelsToDuplicateInEachRow = new TreeMap<>();
+		for (int i = 0; i < copyOf.getWidth(); i++)
 		{
-			int j = getSeamJIndex(seam,i);
-			for (int jj = 0; jj <= j; jj++)
-			{
-				result.matrix[i][jj] = matrixRep.getRGB(i, jj);
-			}
-			// duplicate the seam
-			result.matrix[i][j+1] = matrixRep.getRGB(i, j);
+			List<Integer> currRow = new LinkedList<>();
 			
-			for (int jj = j+2; jj < result.matrix[0].length; jj++)
+			// go over all seams and add pixels of row i
+			for (List<Pixel> seam : seamsRemoved)
 			{
-				result.matrix[i][jj] = matrixRep.getRGB(i, jj-1);
+				for (Pixel pixel : seam)
+				{
+					if (pixel.getOriginal_i() == i)
+					{
+						currRow.add(pixel.getOriginal_j());
+					}
+				}
 			}
+			Collections.sort(currRow);
+			pixelsToDuplicateInEachRow.put(i, currRow);
 		}
-		
-		return result;
+		return pixelsToDuplicateInEachRow;
 	}
+
 
 	private static BufferedImage convertColorMatrixToBufferedImage(ColorMatrix matrixRep) {
 		BufferedImage bufferedImage = new BufferedImage(matrixRep.getWidth(), matrixRep.getHeight(), BufferedImage.TYPE_INT_RGB);
@@ -185,40 +227,29 @@ public class Main {
 		return bufferedImage;
 	}
 
-	// TODO delete before submission
-	private static ColorMatrix drawSeam(ColorMatrix matrixRep, List<Pixel> seam) {
-		ColorMatrix result = matrixRep;
-		for (int i = 0; i < result.matrix.length; i++)
-		{
-			int j = getSeamJIndex(seam,i);
-			for (int jj = 0; jj < matrixRep.matrix[0].length; jj++)
-			{
-				if (j == jj)
-				{
-					// paint seam in white
-					result.matrix[i][jj] = new Color(255,255,255);
-				}
-			}
-		}
-		return result;
-	}
-	
 	
 	private static ColorMatrix removeSeam(ColorMatrix matrixRep, List<Pixel> seam) {
 		ColorMatrix result = new ColorMatrix(matrixRep.getHeight()-1, matrixRep.getWidth());
+		Pixel[][] pixelsResult = result.getPixelsMatrix();
+		
 		for (int i = 0; i < result.matrix.length; i++)
 		{
 			int j = getSeamJIndex(seam,i);
 			for (int jj = 0; jj < j; jj++)
 			{
 				result.matrix[i][jj] = matrixRep.getRGB(i, jj);
+				pixelsResult[i][jj] = matrixRep.getPixel(i, jj);
 			}
 			for (int jj = j+1; jj < matrixRep.matrix[0].length; jj++)
 			{
 				result.matrix[i][jj-1] = matrixRep.getRGB(i, jj);
+				Pixel tmp = matrixRep.getPixel(i, jj);
+				tmp.j--;
+				pixelsResult[i][jj-1] = tmp;
 			}
 		}
 		
+		result.setPixelsMatrix(pixelsResult);
 		return result;
 		
 	}
@@ -234,11 +265,11 @@ public class Main {
 		return -1;
 	}
 
-	private static List<Pixel> computeLowestEnergySeam(int[][] cummulativeEnergy) {
+	private static List<Pixel> computeLowestEnergySeam(int[][] cummulativeEnergy, ColorMatrix matrixRep) {
 		List<Pixel> seam = new LinkedList<>();
 		
 		int currRow = cummulativeEnergy.length-1;
-		Pixel currPixel = getMinBottomPixel(cummulativeEnergy);
+		Pixel currPixel = getMinBottomPixel(cummulativeEnergy, matrixRep);
 		seam.add(currPixel);
 		while (currRow > 0)
 		{
@@ -248,19 +279,19 @@ public class Main {
 			if (currPixel.j > 0 && currPixel.j <= cummulativeEnergy[0].length-1)
 			{
 				int leftNeighborValue = cummulativeEnergy[currRow-1][currPixel.j-1];
-				neighborsValueToPixelMap.put(leftNeighborValue, new Pixel(currRow-1,currPixel.j-1));
+				neighborsValueToPixelMap.put(leftNeighborValue, matrixRep.getPixel(currRow-1,currPixel.j-1));
 			}
 			
 			// right upper neighbor
 			if (currPixel.j >= 0 && currPixel.j < cummulativeEnergy[0].length-1)
 			{
 				int rightNeighborValue = cummulativeEnergy[currRow-1][currPixel.j+1];
-				neighborsValueToPixelMap.put(rightNeighborValue, new Pixel(currRow-1, currPixel.j+1));
+				neighborsValueToPixelMap.put(rightNeighborValue, matrixRep.getPixel(currRow-1,currPixel.j+1));
 			}
 			
 			// upper neighbor
 			int upperNeighborValue = cummulativeEnergy[currRow-1][currPixel.j];
-			neighborsValueToPixelMap.put(upperNeighborValue, new Pixel(currRow-1, currPixel.j));
+			neighborsValueToPixelMap.put(upperNeighborValue,matrixRep.getPixel(currRow-1,currPixel.j));
 			
 			// minimum value
 			currPixel = neighborsValueToPixelMap.firstEntry().getValue();
@@ -271,24 +302,23 @@ public class Main {
 		return seam;
 	}
 
-	private static Pixel getMinBottomPixel(int[][] cummulativeEnergy) {
-		Pixel minBottomPixel = new Pixel(cummulativeEnergy.length-1, -1);
+	private static Pixel getMinBottomPixel(int[][] cummulativeEnergy, ColorMatrix matrixRep) {
+		int i = cummulativeEnergy.length-1;
+		Pixel minBottomPixel = null;
 		int min = Integer.MAX_VALUE;
 		for (int j = 0; j < cummulativeEnergy[0].length; j++)
 		{
 			if (cummulativeEnergy[cummulativeEnergy.length-1][j] < min)
 			{
 				min = cummulativeEnergy[cummulativeEnergy.length-1][j] ;
-				minBottomPixel.j = j;
+				minBottomPixel = matrixRep.getPixel(i, j);
 			}
 		}
 		return minBottomPixel;
 	}
 
-	private static int[][] computeCummulativeMap(int[][] cummulativeEnergy, int[][] energyValues) {
-		
-		if (cummulativeEnergy == null)
-		{
+	private static int[][] computeCummulativeMap(int[][] energyValues) {
+	
 			MValuesCache = new int[energyValues.length][energyValues[0].length];
 			for (int i = 1; i < MValuesCache.length; i++)
 			{
@@ -298,29 +328,8 @@ public class Main {
 				}
 			}
 			return MValuesCache;
-		}
 
-		else
-		{
-			int[][] backup = MValuesCache;
-			MValuesCache = new int[energyValues.length][energyValues[0].length];
-			for (int i = 1; i < MValuesCache.length; i++)
-			{
-				for (int j = 0; j < MValuesCache[0].length; j++)
-				{
-					if (i >= backup.length || j >= backup[0].length)
-					{
-						MValuesCache[i][j] = getM(energyValues,i,j);
-					}
-					else
-					{
-						// no need to compute again
-						MValuesCache[i][j] = backup[i][j]; 
-					}
-				}
-			}
-			return MValuesCache;
-		}
+
 	}
 	
 
