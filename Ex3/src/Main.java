@@ -80,7 +80,7 @@ public class Main {
 			EnergyMatrix cummulativeEnergy = computeCummulativeMap(energyValues);
 			
 			// step 4
-			List<Pixel> seam = computeLowestEnergySeam(cummulativeEnergy, matrixRep);
+			List<Pixel> seam = computeLowestEnergySeam(cummulativeEnergy, matrixRep, energyType);
 			if (enlarge)
 			{
 				seamsRemoved.add(seam);
@@ -248,7 +248,7 @@ public class Main {
 		return -1;
 	}
 
-	private static List<Pixel> computeLowestEnergySeam(EnergyMatrix cummulativeEnergy, ColorMatrix matrixRep) {
+	private static List<Pixel> computeLowestEnergySeam(EnergyMatrix cummulativeEnergy, ColorMatrix matrixRep, int energyType) {
 		List<Pixel> seam = new LinkedList<>();
 		
 		int currRow = cummulativeEnergy.getRows() - 1;
@@ -262,6 +262,21 @@ public class Main {
 			if (currPixel.getCol() > 0 && currPixel.getCol() <= cummulativeEnergy.getCols() - 1)
 			{
 				int leftNeighborValue = cummulativeEnergy.getCell(currRow-1, currPixel.getCol()-1);
+				
+				if (energyType == 2) {
+					int gradRightPixel = 0;
+					if (currPixel.getCol() < matrixRep.getCols() - 1) {
+						gradRightPixel = computePixelGradient(matrixRep, currRow, currPixel.getCol() + 1);
+					}
+					int gradLeftPixel = 0;
+					if (currPixel.getCol() > 0) {
+						gradLeftPixel = computePixelGradient(matrixRep, currRow, currPixel.getCol() - 1);
+					}
+					int gradUpPixel = computePixelGradient(matrixRep, currRow - 1, currPixel.getCol());
+					
+					leftNeighborValue += Math.abs(gradRightPixel - gradLeftPixel) + Math.abs(gradUpPixel - gradLeftPixel);
+				}
+				
 				neighborsValueToPixelMap.put(leftNeighborValue, matrixRep.getPixel(currRow-1,currPixel.getCol()-1));
 			}
 			
@@ -269,11 +284,40 @@ public class Main {
 			if (currPixel.getCol() >= 0 && currPixel.getCol() < cummulativeEnergy.getCols()-1)
 			{
 				int rightNeighborValue = cummulativeEnergy.getCell(currRow-1, currPixel.getCol() + 1);
+				
+				if (energyType == 2) {
+					int gradRightPixel = 0;
+					if (currPixel.getCol() < matrixRep.getCols() - 1) {
+						gradRightPixel = computePixelGradient(matrixRep, currRow, currPixel.getCol() + 1);
+					}					
+					int gradLeftPixel = 0;
+					if (currPixel.getCol() > 0) {
+						gradLeftPixel = computePixelGradient(matrixRep, currRow, currPixel.getCol() - 1);
+					}
+					int gradUpPixel = computePixelGradient(matrixRep, currRow - 1, currPixel.getCol());
+					
+					rightNeighborValue += Math.abs(gradRightPixel - gradLeftPixel) + Math.abs(gradUpPixel - gradRightPixel);
+				}
+				
 				neighborsValueToPixelMap.put(rightNeighborValue, matrixRep.getPixel(currRow-1,currPixel.getCol()+1));
 			}
 			
 			// upper neighbor
 			int upperNeighborValue = cummulativeEnergy.getCell(currRow-1 , currPixel.getCol());
+			
+			if (energyType == 2) {
+				int gradRightPixel = 0;
+				if (currPixel.getCol() < matrixRep.getCols() - 1) {
+					gradRightPixel = computePixelGradient(matrixRep, currRow, currPixel.getCol() + 1);
+				}				
+				int gradLeftPixel = 0;
+				if (currPixel.getCol() > 0) {
+					gradLeftPixel = computePixelGradient(matrixRep, currRow, currPixel.getCol() - 1);
+				}
+				
+				upperNeighborValue += Math.abs(gradRightPixel - gradLeftPixel);
+			}
+			
 			neighborsValueToPixelMap.put(upperNeighborValue,matrixRep.getPixel(currRow-1,currPixel.getCol()));
 			
 			// minimum value
@@ -349,7 +393,7 @@ public class Main {
 			for (int j = 0; j < energyValues.getCols(); j++)
 			{
 				int pixelGradient = computePixelGradient(matrixRep,i,j);
-				if (energyType == 0)
+				if (energyType == 0 || energyType == 2)
 				{
 					energyValues.setCell(i, j, pixelGradient);
 				}
