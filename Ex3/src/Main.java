@@ -89,7 +89,7 @@ public class Main {
 			// step 5
 			matrixRep = removeSeam(matrixRep,seam);
 
-			if (enlarge && numColsLeft == 0)
+			if (enlarge && numRowsLeft == 0)
 			{
 				// it's time to add the removed seams.
 				
@@ -111,7 +111,7 @@ public class Main {
 			
 		}
 	
-		if (enlarge && numRowsLeft == 0)
+		if (enlarge && numColsLeft == 0)
 		{		
 			matrixRep = addSeams(copyOfMatrixRep,seamsRemoved);
 		}
@@ -131,7 +131,7 @@ public class Main {
 
 	private static ColorMatrix addSeams(ColorMatrix copyOf, List<List<Pixel>> seamsRemoved) {
 		int numSeams = seamsRemoved.size();
-		ColorMatrix enlargedColorMatrix = new ColorMatrix(copyOf.getRows() + numSeams, copyOf.getCols());
+		ColorMatrix enlargedColorMatrix = new ColorMatrix(copyOf.getRows() , copyOf.getCols()+ numSeams);
 		
 		// maps a row to (sorted) j-indexes of pixels we have to duplicate
 		TreeMap<Integer,List<Integer>> pixelsToDuplicateInEachRow = prepareRowToPixelsMap(copyOf, seamsRemoved);
