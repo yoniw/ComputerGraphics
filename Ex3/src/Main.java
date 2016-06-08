@@ -57,13 +57,17 @@ public class Main {
 		if (numOutputRows != matrixRep.getRows())
 		{
 			seamsRemoved = new LinkedList<>();
-			matrixRep = reduceImage(matrixRep, numOutputRows, matrixRep.getCols(), energyType);
+			matrixRep.transpose();
+			matrixRep = reduceImage(matrixRep, matrixRep.getRows(), numOutputRows, energyType);
+			matrixRep.transpose();
 		}
 		
 		// enlarge rows
 		if (numOutputRows > copyOfMatrixRep.getRows())
 		{
+			copyOfMatrixRep.transpose();
 			matrixRep = addSeams(copyOfMatrixRep, seamsRemoved);
+			matrixRep.transpose();
 		}
 		
 		
@@ -83,11 +87,10 @@ public class Main {
 		int loopNumber = 1;
 //		boolean enlarge = false;
 		
-		int numRowsLeft, numColsLeft;
-		numRowsLeft = Math.abs(matrixRep.getRows() - numOutputRows);
+		int numColsLeft;
 		numColsLeft = Math.abs(matrixRep.getCols() - numOutputColumns);
 		
-		while (numRowsLeft > 0 || numColsLeft > 0)
+		while (numColsLeft > 0)
 		{
 			System.out.println("loop number: " + loopNumber++ + " rows: " + matrixRep.getRows() + " cols: " + matrixRep.getCols());
 			
@@ -105,18 +108,18 @@ public class Main {
 			EnergyMatrix energyValues = computeEnergyMap(matrixRep, energyType);
 		
 			// step 2
-			boolean transposed = false;
-			if (numRowsLeft > 0)
-			{
-				matrixRep.transpose();
-				energyValues.transpose();
-				transposed = true;
-				numRowsLeft--; 
-			}
-			else
-			{
+//			boolean transposed = false;
+//			if (numRowsLeft > 0)
+//			{
+//				matrixRep.transpose();
+//				energyValues.transpose();
+//				transposed = true;
+//				numRowsLeft--; 
+//			}
+//			else
+//			{
 				numColsLeft--;
-			}
+//			}
 			
 			// step 3
 			EnergyMatrix cummulativeEnergy = computeCummulativeMap(energyValues);
@@ -145,10 +148,10 @@ public class Main {
 //			}
 			
 			// Transpose back.
-			if (transposed) {
-				matrixRep.transpose();
-				energyValues.transpose();
-			}
+//			if (transposed) {
+//				matrixRep.transpose();
+//				energyValues.transpose();
+//			}
 			
 		}
 		
@@ -175,25 +178,37 @@ public class Main {
 		{
 			List<Integer> currRowPixelsToDuplicate = pixelsToDuplicateInEachRow.get(i);
 			int numPixelsDuplicatedCurrRow = 0;
-			for (int j = 0; j < enlargedColorMatrix.getCols(); j++)
-			{
-				// get a 'regular' pixel
-				enlargedColorMatrix.setCell(i, j, copyOf.getCell(i, j-numPixelsDuplicatedCurrRow));
-				Pixel p = new Pixel(i, j-numPixelsDuplicatedCurrRow);
-				p.setOriginalRow(p.getRow());
-				p.setOriginalCol(p.getCol());
-				enlargedPixelMatrix[i][j] = p;
+			int j = 0;
+			while (j < enlargedColorMatrix.getCols()) {
 				
-				if (currRowPixelsToDuplicate.contains(j-numPixelsDuplicatedCurrRow))
-				{
-					// we have to duplicate this pixel to the right					
-					enlargedColorMatrix.setCell(i, j+1, copyOf.getCell(i, j-numPixelsDuplicatedCurrRow));
-					p = new Pixel(i, j-numPixelsDuplicatedCurrRow+1);
+				// get a 'regular' pixel
+				try {
+					enlargedColorMatrix.setCell(i, j, copyOf.getCell(i, j-numPixelsDuplicatedCurrRow));
+					Pixel p = new Pixel(i, j-numPixelsDuplicatedCurrRow);
 					p.setOriginalRow(p.getRow());
 					p.setOriginalCol(p.getCol());
-					enlargedPixelMatrix[i][j+1] = p;
+					enlargedPixelMatrix[i][j] = p;
 					
-					numPixelsDuplicatedCurrRow++;
+					if (currRowPixelsToDuplicate.contains(j-numPixelsDuplicatedCurrRow) && j < enlargedColorMatrix.getCols() - 1)
+					{
+						// we have to duplicate this pixel to the right					
+						enlargedColorMatrix.setCell(i, j+1, copyOf.getCell(i, j-numPixelsDuplicatedCurrRow));
+						p = new Pixel(i, j-numPixelsDuplicatedCurrRow+1);
+						p.setOriginalRow(p.getRow());
+						p.setOriginalCol(p.getCol());
+						enlargedPixelMatrix[i][j+1] = p;
+						
+						numPixelsDuplicatedCurrRow++;
+						j++;
+					}
+				} catch (Exception ex) {
+					// TODO: Shouldn't reach
+					enlargedColorMatrix.setCell(i, j, new Color(0));
+					Pixel p = new Pixel(i, j-numPixelsDuplicatedCurrRow);
+					p.setOriginalRow(p.getRow());
+					p.setOriginalCol(p.getCol());
+					enlargedPixelMatrix[i][j] = p;
+				} finally {
 					j++;
 				}
 			}
@@ -250,6 +265,9 @@ public class Main {
 		for (int i = 0; i < result.getRows(); i++)
 		{
 			int j = getSeamJIndex(seam,i);
+			if (j == -1) {
+				j = seam.get(i).getCol();
+			}
 			for (int jj = 0; jj < j; jj++)
 			{
 				result.setCell(i, jj, matrixRep.getCell(i, jj));
