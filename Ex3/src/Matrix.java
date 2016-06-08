@@ -18,7 +18,13 @@ public class Matrix<T> {
 	public Matrix(int rows, int cols, Object[][] data)
 	{
 		this(rows, cols);
-		this.data = data;
+		for (int i = 0; i < rows; i++)
+		{
+			for (int j = 0; j < cols; j++)
+			{
+				this.data[i][j] = data[i][j];
+			}
+		}
 	}
 	
 	public int getRows() {

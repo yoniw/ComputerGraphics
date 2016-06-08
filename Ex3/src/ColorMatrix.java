@@ -6,8 +6,24 @@ public class ColorMatrix extends Matrix<Color> {
 	private Pixel[][] pixelsMatrix;
 
 	public ColorMatrix(ColorMatrix copyOfMatrixRep) {
-		super(copyOfMatrixRep.getRows(), copyOfMatrixRep.getCols(), copyOfMatrixRep.getData());
-		pixelsMatrix = copyOfMatrixRep.getPixelsMatrix();
+		super(copyOfMatrixRep.getRows(), copyOfMatrixRep.getCols(), copyOfMatrixRep.getData());		
+		
+		pixelsMatrix = new Pixel[copyOfMatrixRep.getRows()][copyOfMatrixRep.getCols()];
+		for (int i = 0; i < getRows(); i++)
+		{
+			for (int j = 0; j < getCols(); j++)
+			{
+				Pixel other = copyOfMatrixRep.getPixel(i, j);
+				if (other == null)
+				{
+					pixelsMatrix[i][j] = null;
+				}
+				else
+				{
+					pixelsMatrix[i][j] = new Pixel(other);
+				}
+			}
+		}
 	}
 	
 	public ColorMatrix(BufferedImage img) {

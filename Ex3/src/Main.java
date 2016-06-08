@@ -11,7 +11,8 @@ import javax.imageio.*;
 
 
 public class Main {
-
+	
+	private static BufferedImage bufferedImage;
 	// holds M values 
 	private static EnergyMatrix MValuesCache;
 	// holds Pmn values
@@ -27,38 +28,43 @@ public class Main {
 		int energyType = Integer.parseInt(args[3]); 
 		String outputImagePath = args[4];
 		
-		BufferedImage inputImage = null;
+		bufferedImage = null;
 		try {
-			inputImage = ImageIO.read(new File(inputImagePath));
+			bufferedImage = ImageIO.read(new File(inputImagePath));
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}	
 		
-		ColorMatrix matrixRep = new ColorMatrix(inputImage);
+		
+		ColorMatrix matrixRep = new ColorMatrix(bufferedImage);
 		ColorMatrix copyOfMatrixRep = new ColorMatrix(matrixRep);
 		
-
+		bufferedImage.flush();
+		
 		seamsRemoved = new LinkedList<>();
 		// reduce cols 
 		if (numOutputColumns != matrixRep.getCols())
 		{
-			matrixRep = reduceImage(matrixRep, matrixRep.getRows(), numOutputColumns, energyType);
+			matrixRep = reduceImage(matrixRep, numOutputColumns, energyType);
 		}
 		
 		// enlarge cols
 		if (numOutputColumns > copyOfMatrixRep.getCols())
 		{
 			matrixRep = addSeams(copyOfMatrixRep, seamsRemoved);
-			copyOfMatrixRep = new ColorMatrix(matrixRep);
 		}
 		
+
+		matrixRep = getNewMatrixRep(matrixRep);
+		copyOfMatrixRep = new ColorMatrix(matrixRep);
+
 		// reduce rows
 		if (numOutputRows != matrixRep.getRows())
 		{
 			seamsRemoved = new LinkedList<>();
 			matrixRep.transpose();
-			matrixRep = reduceImage(matrixRep, matrixRep.getRows(), numOutputRows, energyType);
+			matrixRep = reduceImage(matrixRep, numOutputRows, energyType);
 			matrixRep.transpose();
 		}
 		
@@ -71,10 +77,10 @@ public class Main {
 		}
 		
 		
-		BufferedImage outputImage = convertColorMatrixToBufferedImage(matrixRep);
+		bufferedImage = convertColorMatrixToBufferedImage(matrixRep);
 		
 		try {
-			ImageIO.write(outputImage, "jpg", new File(outputImagePath));
+			ImageIO.write(bufferedImage, "jpg", new File(outputImagePath));
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -82,83 +88,41 @@ public class Main {
 		
 	}
 
-	private static ColorMatrix reduceImage(ColorMatrix matrixRep, int numOutputRows, int numOutputColumns, int energyType)
-	{
-		int loopNumber = 1;
-//		boolean enlarge = false;
+	private static ColorMatrix getNewMatrixRep(ColorMatrix matrixRep) {
+		bufferedImage = convertColorMatrixToBufferedImage(matrixRep);
 		
+		ColorMatrix newMatrixRep = new ColorMatrix(bufferedImage);
+
+		
+		return new ColorMatrix(newMatrixRep);
+	}
+
+	private static ColorMatrix reduceImage(ColorMatrix matrixRep, int numOutputColumns, int energyType)
+	{
+		int loopNumber = 1;		
 		int numColsLeft;
 		numColsLeft = Math.abs(matrixRep.getCols() - numOutputColumns);
 		
 		while (numColsLeft > 0)
 		{
 			System.out.println("loop number: " + loopNumber++ + " rows: " + matrixRep.getRows() + " cols: " + matrixRep.getCols());
-			
-//			enlarge = false;
-//			if (numColsLeft > 0 && matrixRep.getCols() < numOutputColumns)
-//			{
-//				enlarge = true;
-//			}
-//			else if (numColsLeft == 0 && matrixRep.getRows() < numOutputRows)
-//			{
-//				enlarge = true;
-//			}
-			
+	
 			// step 1
 			EnergyMatrix energyValues = computeEnergyMap(matrixRep, energyType);
-		
-			// step 2
-//			boolean transposed = false;
-//			if (numRowsLeft > 0)
-//			{
-//				matrixRep.transpose();
-//				energyValues.transpose();
-//				transposed = true;
-//				numRowsLeft--; 
-//			}
-//			else
-//			{
-				numColsLeft--;
-//			}
-			
+
+			numColsLeft--;
+
 			// step 3
 			EnergyMatrix cummulativeEnergy = computeCummulativeMap(energyValues);
-			
 			// step 4
 			List<Pixel> seam = computeLowestEnergySeam(cummulativeEnergy, matrixRep, energyType);
-
 			seamsRemoved.add(seam);
 
-			
 			// step 5
 			matrixRep = removeSeam(matrixRep,seam);
-
-//			if (enlarge && numRowsLeft == 0)
-//			{
-//				// it's time to add the removed seams.
-//				
-//				//transpose copyOf
-//				copyOfMatrixRep.transpose();
-//							
-//				matrixRep = addSeams(copyOfMatrixRep,seamsRemoved);
-//				// later, when we add rows, the "original image" will be matrixRep 
-//				copyOfMatrixRep = matrixRep;
-//				// clean seams list
-//				seamsRemoved = new LinkedList<>();
-//			}
-			
-			// Transpose back.
-//			if (transposed) {
-//				matrixRep.transpose();
-//				energyValues.transpose();
-//			}
 			
 		}
 		
-//		if (enlarge && numColsLeft == 0)
-//		{		
-//			matrixRep = addSeams(copyOfMatrixRep,seamsRemoved);
-//		}
 		
 		return matrixRep;
 		
@@ -403,6 +367,7 @@ public class Main {
 				for (int j = 0; j < MValuesCache.getCols(); j++)
 				{
 					MValuesCache.setCell(i, j, getM(energyValues,i,j));
+
 				}
 			}
 			return MValuesCache;
