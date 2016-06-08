@@ -17,6 +17,7 @@ public class Main {
 	// holds Pmn values
 	private static EnergyMatrix PmnValuesCache;
 	
+	private static List<List<Pixel>> seamsRemoved;
 
 	public static void main(String[] args)
 	{
@@ -35,11 +36,52 @@ public class Main {
 		}	
 		
 		ColorMatrix matrixRep = new ColorMatrix(inputImage);
-		ColorMatrix copyOfMatrixRep = new ColorMatrix(inputImage);
+		ColorMatrix copyOfMatrixRep = new ColorMatrix(matrixRep);
 		
+
+		seamsRemoved = new LinkedList<>();
+		// reduce cols 
+		if (numOutputColumns != matrixRep.getCols())
+		{
+			matrixRep = reduceImage(matrixRep, matrixRep.getRows(), numOutputColumns, energyType);
+		}
+		
+		// enlarge cols
+		if (numOutputColumns > copyOfMatrixRep.getCols())
+		{
+			matrixRep = addSeams(copyOfMatrixRep, seamsRemoved);
+			copyOfMatrixRep = new ColorMatrix(matrixRep);
+		}
+		
+		// reduce rows
+		if (numOutputRows != matrixRep.getRows())
+		{
+			seamsRemoved = new LinkedList<>();
+			matrixRep = reduceImage(matrixRep, numOutputRows, matrixRep.getCols(), energyType);
+		}
+		
+		// enlarge rows
+		if (numOutputRows > copyOfMatrixRep.getRows())
+		{
+			matrixRep = addSeams(copyOfMatrixRep, seamsRemoved);
+		}
+		
+		
+		BufferedImage outputImage = convertColorMatrixToBufferedImage(matrixRep);
+		
+		try {
+			ImageIO.write(outputImage, "jpg", new File(outputImagePath));
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+	}
+
+	private static ColorMatrix reduceImage(ColorMatrix matrixRep, int numOutputRows, int numOutputColumns, int energyType)
+	{
 		int loopNumber = 1;
-		boolean enlarge = false;
-		List<List<Pixel>> seamsRemoved = new LinkedList<>();
+//		boolean enlarge = false;
 		
 		int numRowsLeft, numColsLeft;
 		numRowsLeft = Math.abs(matrixRep.getRows() - numOutputRows);
@@ -49,15 +91,15 @@ public class Main {
 		{
 			System.out.println("loop number: " + loopNumber++ + " rows: " + matrixRep.getRows() + " cols: " + matrixRep.getCols());
 			
-			enlarge = false;
-			if (numColsLeft > 0 && matrixRep.getCols() < numOutputColumns)
-			{
-				enlarge = true;
-			}
-			else if (numColsLeft == 0 && matrixRep.getRows() < numOutputRows)
-			{
-				enlarge = true;
-			}
+//			enlarge = false;
+//			if (numColsLeft > 0 && matrixRep.getCols() < numOutputColumns)
+//			{
+//				enlarge = true;
+//			}
+//			else if (numColsLeft == 0 && matrixRep.getRows() < numOutputRows)
+//			{
+//				enlarge = true;
+//			}
 			
 			// step 1
 			EnergyMatrix energyValues = computeEnergyMap(matrixRep, energyType);
@@ -81,27 +123,26 @@ public class Main {
 			
 			// step 4
 			List<Pixel> seam = computeLowestEnergySeam(cummulativeEnergy, matrixRep, energyType);
-			if (enlarge)
-			{
-				seamsRemoved.add(seam);
-			}
+
+			seamsRemoved.add(seam);
+
 			
 			// step 5
 			matrixRep = removeSeam(matrixRep,seam);
 
-			if (enlarge && numRowsLeft == 0)
-			{
-				// it's time to add the removed seams.
-				
-				//transpose copyOf
-				copyOfMatrixRep.transpose();
-							
-				matrixRep = addSeams(copyOfMatrixRep,seamsRemoved);
-				// later, when we add rows, the "original image" will be matrixRep 
-				copyOfMatrixRep = matrixRep;
-				// clean seams list
-				seamsRemoved = new LinkedList<>();
-			}
+//			if (enlarge && numRowsLeft == 0)
+//			{
+//				// it's time to add the removed seams.
+//				
+//				//transpose copyOf
+//				copyOfMatrixRep.transpose();
+//							
+//				matrixRep = addSeams(copyOfMatrixRep,seamsRemoved);
+//				// later, when we add rows, the "original image" will be matrixRep 
+//				copyOfMatrixRep = matrixRep;
+//				// clean seams list
+//				seamsRemoved = new LinkedList<>();
+//			}
 			
 			// Transpose back.
 			if (transposed) {
@@ -110,24 +151,15 @@ public class Main {
 			}
 			
 		}
-	
-		if (enlarge && numColsLeft == 0)
-		{		
-			matrixRep = addSeams(copyOfMatrixRep,seamsRemoved);
-		}
 		
+//		if (enlarge && numColsLeft == 0)
+//		{		
+//			matrixRep = addSeams(copyOfMatrixRep,seamsRemoved);
+//		}
 		
-		BufferedImage outputImage = convertColorMatrixToBufferedImage(matrixRep);
-		
-		try {
-			ImageIO.write(outputImage, "jpg", new File(outputImagePath));
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		return matrixRep;
 		
 	}
-
 
 	private static ColorMatrix addSeams(ColorMatrix copyOf, List<List<Pixel>> seamsRemoved) {
 		int numSeams = seamsRemoved.size();

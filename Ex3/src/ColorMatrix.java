@@ -5,6 +5,10 @@ public class ColorMatrix extends Matrix<Color> {
 
 	private Pixel[][] pixelsMatrix;
 
+	public ColorMatrix(ColorMatrix copyOfMatrixRep) {
+		super(copyOfMatrixRep.getRows(), copyOfMatrixRep.getCols(), copyOfMatrixRep.getData());
+		pixelsMatrix = copyOfMatrixRep.getPixelsMatrix();
+	}
 	
 	public ColorMatrix(BufferedImage img) {
 		super(img.getHeight(), img.getWidth());
@@ -29,6 +33,8 @@ public class ColorMatrix extends Matrix<Color> {
 	}
 	
 	
+
+
 	@Override
 	public void transpose() {
 		super.transpose();

@@ -15,6 +15,11 @@ public class Matrix<T> {
 		this.data = new Object[rows][cols];
 	}
 
+	public Matrix(int rows, int cols, Object[][] data)
+	{
+		this(rows, cols);
+		this.data = data;
+	}
 	
 	public int getRows() {
 		return rows;
@@ -39,7 +44,6 @@ public class Matrix<T> {
 	public Object[][] getData() {
 		return data;
 	}
-	
 	
 	public void transpose() {
 		Object[][] newData = new Object[cols][rows];
