@@ -32,7 +32,7 @@ public class Main {
 		try {
 			bufferedImage = ImageIO.read(new File(inputImagePath));
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
+			//Auto-generated catch block
 			e.printStackTrace();
 		}	
 		
@@ -82,31 +82,25 @@ public class Main {
 		try {
 			ImageIO.write(bufferedImage, "jpg", new File(outputImagePath));
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
+			// Auto-generated catch block
 			e.printStackTrace();
 		}
 		
 	}
 
 	private static ColorMatrix getNewMatrixRep(ColorMatrix matrixRep) {
-		bufferedImage = convertColorMatrixToBufferedImage(matrixRep);
-		
+		bufferedImage = convertColorMatrixToBufferedImage(matrixRep);	
 		ColorMatrix newMatrixRep = new ColorMatrix(bufferedImage);
-
-		
 		return new ColorMatrix(newMatrixRep);
 	}
 
 	private static ColorMatrix reduceImage(ColorMatrix matrixRep, int numOutputColumns, int energyType)
 	{
-		int loopNumber = 1;		
 		int numColsLeft;
 		numColsLeft = Math.abs(matrixRep.getCols() - numOutputColumns);
 		
 		while (numColsLeft > 0)
-		{
-			System.out.println("loop number: " + loopNumber++ + " rows: " + matrixRep.getRows() + " cols: " + matrixRep.getCols());
-	
+		{	
 			// step 1
 			EnergyMatrix energyValues = computeEnergyMap(matrixRep, energyType);
 
@@ -120,12 +114,9 @@ public class Main {
 
 			// step 5
 			matrixRep = removeSeam(matrixRep,seam);
-			
 		}
 		
-		
 		return matrixRep;
-		
 	}
 
 	private static ColorMatrix addSeams(ColorMatrix copyOf, List<List<Pixel>> seamsRemoved) {
@@ -166,7 +157,6 @@ public class Main {
 						j++;
 					}
 				} catch (Exception ex) {
-					// TODO: Shouldn't reach
 					enlargedColorMatrix.setCell(i, j, new Color(0));
 					Pixel p = new Pixel(i, j-numPixelsDuplicatedCurrRow);
 					p.setOriginalRow(p.getRow());
@@ -371,8 +361,6 @@ public class Main {
 				}
 			}
 			return MValuesCache;
-
-
 	}
 	
 
